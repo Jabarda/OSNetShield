@@ -118,6 +118,10 @@ ClientBin/
 *.pfx
 *.publishsettings
 
+#Ignore Intellij configs
+EasyFirewall/.idea/*.xml
+EasyFirewall/.idea/copyright/*.xml
+
 # RIA/Silverlight projects
 Generated_Code/
 
