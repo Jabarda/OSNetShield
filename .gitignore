@@ -158,3 +158,5 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+EasyFirewall/.idea/workspace.xml
+EasyFirewall/.idea/vcs.xml
