@@ -1,2 +1,3 @@
 # OSNetShield
-our project
+developers:
+Alekseev Eugene - teamleader <Vukiz1236@gmail.com>
