@@ -11,6 +11,7 @@ public class EasyFirewall {
 
     public static void main(String[] args) {
         JFrame window = new JFrame("EasyFirewall");
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         window.setLayout(new GridLayout());
         window.setSize(500, 500);
