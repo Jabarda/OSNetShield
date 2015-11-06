@@ -1,62 +1,6 @@
 #include "stdafx.h"
-#include <stdio.h>
-#include <cFwAccess.h>
+#include "cFwAccess.h"
 
-
-// Forward declarations
-HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2);
-void changeOrGetRule(std::vector<BSTR> &vFwAddedRulesm, int nAction);
-void cleanup(
-	BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, 
-	INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
-	std::vector<BSTR> &vFwAddedRules,
-	HRESULT &hrComInit
-	);
-
-int __cdecl main()
-{
-	int menuAction = 0;
-
-	std::string sName, sDescription, sGroup, sAddr;
-
-	cFwAccess oFwChanger;
-	//std::vector<BSTR> vFwAddedRules;
-	
-	//changeOrGetRule(vFwAddedRules, 0);
-	
-	std::cout << "The application blocks and unblocks a site by its IP\n";
-
-	while(menuAction != 3)
-	{
-		std::cout << "\n1) Block IP\n2) Unblock IP\n3) Exit\n";
-		std::cin >> menuAction;
-		getchar();
-		if(menuAction == 1)
-		{
-			std::cout << "The rule name is OSNetShield" << oFwChanger.getRulesCount()+1 << "\n";
-			sName = "OSNetShield"+std::to_string(oFwChanger.getRulesCount()+1);
-			std::cout << "Enter the rule description:\t";
-			std::getline(std::cin, sDescription);
-			std::cout << "Enter the rule group:\t";
-			std::getline(std::cin, sGroup);
-			std::cout << "Enter the IP to block:\t";
-			std::getline(std::cin, sAddr);
-			oFwChanger.addRule(sName, sDescription, sGroup, sAddr);
-			getchar();
-			oFwChanger.removeRule(sName);
-		}
-		else if(menuAction == 2)
-		{
-			std::cout << "Enter the rule name:\t";
-			std::getline(std::cin, sName);
-			oFwChanger.removeRule(sName);
-		}
-	}
-
-    return 0;
-}
-
-/*
 // Instantiate INetFwPolicy2
 HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
 {
@@ -77,7 +21,27 @@ HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
     return hr;
 }
 
-void changeOrGetRule(std::vector<BSTR> &vFwAddedRules, int nAction)
+cFwAccess::cFwAccess(void)
+{
+	int nSize = -1;
+	std::string sDscr = "Default";
+	std::string sGrp = "Default";
+	std::string sAddr = "0.0.0.0";
+
+	while(nSize != vFwAddedRules.size())
+	{
+		nSize = vFwAddedRules.size();
+		ruleMaker("OSNetShield" + std::to_string(vFwAddedRules.size()+1), sDscr,sGrp, sAddr, 0);
+	}
+	//for(int i =0; i< vFwAddedRules.size(); i++)
+	//	std::cout << vFwAddedRules[i] << " ";
+}
+
+cFwAccess::~cFwAccess(void)
+{
+}
+
+void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr, int nAction)
 {
 	HRESULT hrComInit = S_OK;
     HRESULT hr = S_OK;
@@ -87,10 +51,14 @@ void changeOrGetRule(std::vector<BSTR> &vFwAddedRules, int nAction)
     INetFwRule *pFwRule = NULL;
 
     BSTR bstrRuleName = SysAllocString(L"OSNetShield");
-    BSTR bstrRuleDescription = SysAllocString(L"Block outbound connection to habrahabr.ru");
+	BSTR bstrRuleDescription = SysAllocString(L"Default");
     BSTR bstrRuleGroup = SysAllocString(L"OSNetShield group");
 	BSTR bstrRuleRemoteAdresses = SysAllocString(L"178.248.233.33");
 
+	//BSTR bstrRuleName = SysAllocString(std::wstring(sName.begin(), sName.end()).c_str());
+	//BSTR bstrRuleDescription = SysAllocString(std::wstring(sDscr.begin(), sDscr.end()).c_str());
+	//BSTR bstrRuleGroup = SysAllocString(std::wstring(sGrp.begin(), sGrp.end()).c_str());
+	//BSTR bstrRuleRemoteAdresses = SysAllocString(std::wstring(sAddr.begin(), sAddr.end()).c_str());
 	
 	// Initialize COM.
 	hrComInit = CoInitializeEx(
@@ -249,47 +217,30 @@ void changeOrGetRule(std::vector<BSTR> &vFwAddedRules, int nAction)
 		);
 }
 
-void cleanup(
+void cFwAccess::addRule(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr)
+{
+	ruleMaker(sName, sDscr, sGrp, sAddr, 1);
+}
+
+void cFwAccess::removeRule(std::string &sName)
+{
+	std::string sDscr = "Default";
+	std::string sGrp = "Default";
+	std::string sAddr = "0.0.0.0";
+	ruleMaker(sName, sDscr, sGrp, sAddr, 2);
+}
+
+void cFwAccess::cleanup(
 	BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, 
 	INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
 	std::vector<BSTR> &vFwAddedRules,
-	HRESULT &hrComInit)
+	HRESULT &hrComInit
+	)
 {
-	// Free BSTR's
-    SysFreeString(bstrRuleName);
-    SysFreeString(bstrRuleDescription);
-    SysFreeString(bstrRuleGroup);
-	SysFreeString(bstrRuleRemoteAdresses);
 
-	// Free vector
-	if(vFwAddedRules.empty())
-	{
-		vFwAddedRules.clear();
-	}
-	
-    // Release the INetFwRule object
-    if (pFwRule != NULL)
-    {
-        pFwRule->Release();
-    }
-
-    // Release the INetFwRules object
-    if (pFwRules != NULL)
-    {
-        pFwRules->Release();
-    }
-
-    // Release the INetFwPolicy2 object
-    if (pNetFwPolicy2 != NULL)
-    {
-        pNetFwPolicy2->Release();
-    }
-
-    // Uninitialize COM.
-    if (SUCCEEDED(hrComInit))
-    {
-        CoUninitialize();
-    }
 }
 
-*/
+int cFwAccess::getRulesCount()
+{
+	return vFwAddedRules.size();
+}
