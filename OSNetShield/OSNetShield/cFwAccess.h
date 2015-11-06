@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+//#include <afx.h>
+#include "atlstr.h"
 
 #pragma once
 #pragma comment( lib, "ole32.lib" )
@@ -13,7 +15,7 @@ class cFwAccess
 public:
 	cFwAccess(void);
 	~cFwAccess(void);
-	void ruleMaker(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr, int nAction);
+	void ruleMaker(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr, int nAction, std::vector<BSTR> &vFwAddedRules);
 	void addRule(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr);
 	void removeRule(std::string &sName);
 	void cleanup(
@@ -24,7 +26,7 @@ public:
 		);
 	int getRulesCount();
 
-private:
-	std::vector<BSTR> vFwAddedRules;
+//private:
+	//std::vector<BSTR> vFwAddedRules;
 };
 
