@@ -9,7 +9,12 @@
 *Защита от нежелательных и вредоносных подключений
 
 
-Реализованные, на момент последнего релиза(5.11.2015), возможности:
+ChangeLog:
 Java with netsh warp : 
-  *blocking/unblocking ethernet connection
-C++ with Windows Firewall API : unblocking/blocking connection to chosen ip(habrahabr.ru aka 178.248.233.33)
+  *blocking/unblocking ethernet connection - deprecated
+-release 5/11/2015
+  C++ with Windows Firewall API : unblocking/blocking connection to chosen ip(habrahabr.ru aka 178.248.233.33)
+-release 12/11/2015
+  *massive bug fixes
+  +sniffer
+  +blocking unblocking inputed ip
