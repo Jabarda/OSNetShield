@@ -1,11 +1,15 @@
 #include "stdafx.h"
 #include <stdio.h>
-#include <cFwAccess.h>
+#include "NetShieldSniffer.h"
+#include "cFwAccess.h"
 
 int __cdecl main()
 {
 	int menuAction = 0;
-
+	NetShieldSniffer mySniffa;
+	mySniffa.startListen();
+	std::cout << "Sniffer started sniffing";
+	
 	std::string sName = "Name", sDescription = "Description", sGroup = "Group", sAddr = "0.0.0.0";
 
 	cFwAccess oFwChanger;
