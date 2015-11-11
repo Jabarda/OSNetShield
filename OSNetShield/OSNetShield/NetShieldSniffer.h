@@ -32,7 +32,7 @@ private:
 	char name[128];
 	HOSTENT* phe;
 	SOCKADDR_IN sa;
-	u_long flag = 1;
+	u_long flag;
 public:
 	NetShieldSniffer();
 	~NetShieldSniffer();
