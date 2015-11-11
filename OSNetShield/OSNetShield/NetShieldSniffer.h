@@ -23,6 +23,7 @@ typedef struct _IPHeader
 	unsigned long  dest;     // IP-адрес назначения 
 }IPHeader;
 
+void listenFunThr(SOCKET &s);
 class NetShieldSniffer
 {
 private:
@@ -37,6 +38,5 @@ public:
 	~NetShieldSniffer();
 	void startListen();
 	void stopListen();
-	void listenFunThr();
 };
 

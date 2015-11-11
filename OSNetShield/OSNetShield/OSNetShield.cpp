@@ -8,7 +8,7 @@ int __cdecl main()
 	int menuAction = 0;
 	NetShieldSniffer mySniffa;
 	mySniffa.startListen();
-	std::cout << "Sniffer started sniffing";
+	std::cout << "Sniffer started sniffing\n";
 	
 	std::string sName = "Name", sDescription = "Description", sGroup = "Group", sAddr = "0.0.0.0";
 

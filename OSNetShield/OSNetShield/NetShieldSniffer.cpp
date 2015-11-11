@@ -23,21 +23,23 @@ NetShieldSniffer::~NetShieldSniffer()
 {
 }
 
-void listenFunThr(){
-	int count;
-	count = recv(s, Buffer, sizeof(Buffer), 0);
-
-	if (count >= sizeof(IPHeader))
-	{
-		IPHeader* hdr = (IPHeader *)Buffer;
-		std::cout << hdr;
+void listenFunThr(SOCKET &s){
+	while (true){
+		int count;
+		count = recv(s, Buffer, sizeof(Buffer), 0);
+		std::cout << "cycleiter";
+		if (count >= sizeof(IPHeader))
+		{
+			IPHeader* hdr = (IPHeader *)Buffer;
+			std::cout << hdr;
+		}
 	}
 }
 void NetShieldSniffer::startListen(){
 
 	// Приём IP-пакетов.
-	std::thread t(listenFunThr);
-	
+	std::thread t(listenFunThr, s);
+	t.detach();
 		
 }
 
