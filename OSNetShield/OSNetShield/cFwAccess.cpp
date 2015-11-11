@@ -30,7 +30,7 @@ cFwAccess::~cFwAccess(void)
 {
 }
 
-void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr, int nAction, std::vector<BSTR> &vFwAddedRules)
+void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &sGrp, std::string &sAddr, int nAction, std::vector<std::wstring> &vFwAddedRules)
 {
 	HRESULT hrComInit = S_OK;
     HRESULT hr = S_OK;
@@ -141,7 +141,7 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 		}
 		else
 		{
-			vFwAddedRules.push_back(bstrRuleName);
+			vFwAddedRules.push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
 			std::cout << "IP successfully blocked.\n";
 		}
 	}
@@ -167,9 +167,9 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 		else
 		{
 			std::cout << "IP successfully unblocked.\n";
-			for( std::vector<BSTR>::iterator iter = vFwAddedRules.begin(); iter != vFwAddedRules.end(); ++iter )
+			for( std::vector<std::wstring>::iterator iter = vFwAddedRules.begin(); iter != vFwAddedRules.end(); ++iter )
 			{
-				if( *iter == bstrRuleName )
+				if( *iter == std::wstring (bstrRuleName, SysStringLen(bstrRuleName)) )
 				{
 					vFwAddedRules.erase( iter );
 					break;
@@ -183,15 +183,15 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 	}
 
 	// Get the existing rule
-	if(nAction == 0)
-	{
-		hr = pFwRules->Item(bstrRuleName, &pFwRule);
-
-		if (SUCCEEDED(hr))
-		{
-			vFwAddedRules.push_back(bstrRuleName);
-		}
-	}
+	//if(nAction == 0)
+	//{
+	//	hr = pFwRules->Item(bstrRuleName, &pFwRule);
+//
+	//	if (SUCCEEDED(hr))
+	//	{
+	//		vFwAddedRules.push_back(bstrRuleName);
+	//	}
+	//}
 
 	cleanup(
 		bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses,
@@ -204,7 +204,7 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 void cFwAccess::cleanup(
 	BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, 
 	INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
-	std::vector<BSTR> &vFwAddedRules,
+	std::vector<std::wstring> &vFwAddedRules,
 	HRESULT &hrComInit
 	)
 {

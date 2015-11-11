@@ -14,7 +14,7 @@ int __cdecl main()
 
 	cFwAccess oFwChanger;
 
-	std::vector<BSTR> vFwAddedRules;
+	std::vector<std::wstring> vFwAddedRules;
 	
 	oFwChanger.ruleMaker(sName, sDescription, sGroup, sAddr, 0, vFwAddedRules);
 
@@ -23,13 +23,15 @@ int __cdecl main()
 	while(menuAction != 3)
 	{
 		std::cout << vFwAddedRules.size() << "\n";
+		for(int i=0; i<vFwAddedRules.size(); i++)
+			std::wcout << vFwAddedRules[i] << "\n";
 		std::cout << "\n1) Block IP\n2) Unblock IP\n3) Exit\n";
 		std::cin >> menuAction;
 		getchar();
 		if(menuAction == 1)
 		{
-			std::cout << "The rule name is OSNetShield" << vFwAddedRules.size()+1 << "\n";
-			sName = "OSNetShield"+std::to_string(vFwAddedRules.size()+1);
+			std::cout << "The rule name is " << vFwAddedRules.size()+1 << "\n";
+			sName = std::to_string(vFwAddedRules.size()+1);
 			std::cout << "Enter the rule description:\t";
 			std::getline(std::cin, sDescription);
 			std::cout << "Enter the rule group:\t";
