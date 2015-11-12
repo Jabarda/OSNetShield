@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 #include "atlstr.h"
+#include "mainForm.h"
+#include <stdio.h>
+#include <thread>
 
 #pragma once
 #pragma comment( lib, "ole32.lib" )
@@ -26,5 +29,6 @@ public:
 		);
 	std::string makeRuleName(std::vector<std::wstring> &vFwAddedRules);
 	void controlFw();
+	//void thread_Proc();
 };
 

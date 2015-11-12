@@ -6,6 +6,7 @@
 #include "cFwAccess.h"
 
 
+
 // Instantiate INetFwPolicy2
 HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
 {
@@ -305,8 +306,11 @@ std::string cFwAccess::makeRuleName(std::vector<std::wstring> &vFwAddedRules)
 	return sName;
 }
 
+
+
 void cFwAccess::controlFw()
 {
+
 	int menuAction = 0;
 	std::string sName = "Name", sDescription = "Block ", sAddr = "0.0.0.0";
 	std::vector<std::wstring> vFwAddedRules;
@@ -316,11 +320,12 @@ void cFwAccess::controlFw()
 
 	std::cout << "The application blocks and unblocks a site by its IP\n";
 
-	while(menuAction != 3)
+	while(menuAction != 4)
 	{
-		std::cout << "\n1) Block IP\n2) Unblock IP\n3) Exit\n";
+		std::cout << "\n1) Block IP\n2) Unblock IP\n3) Start GUI\n3) Exit\n";
 		std::cin >> menuAction;
 		getchar();
+
 		if(menuAction == 1)
 		{
 			sName = makeRuleName(vFwAddedRules);
@@ -333,12 +338,13 @@ void cFwAccess::controlFw()
 			ruleMaker(sName+"in", sDescription, sAddr, 1, vFwAddedRules, NET_FW_RULE_DIR_IN);
 			ruleMaker(sName+"out", sDescription, sAddr, 1, vFwAddedRules, NET_FW_RULE_DIR_OUT);
 		}
-		else if(menuAction == 2)
+		if(menuAction == 2)
 		{
 			std::cout << "Enter the rule name:\t";
 			std::getline(std::cin, sName);
 			ruleMaker(sName+"in", sDescription, sAddr, 2, vFwAddedRules, NET_FW_RULE_DIR_IN);
 			ruleMaker(sName+"out", sDescription, sAddr, 2, vFwAddedRules, NET_FW_RULE_DIR_OUT);
 		}
+		//if (menuAction == 3) std::thread thr(thread_Proc);
 	}
 }
