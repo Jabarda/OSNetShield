@@ -6,7 +6,7 @@
 
 #define MAX_PACKET_SIZE 0x10000
 
-static char Buffer [MAX_PACKET_SIZE];
+static char  Buffer[MAX_PACKET_SIZE];
 #pragma once
 
 typedef struct _IPHeader
@@ -23,7 +23,7 @@ typedef struct _IPHeader
 	unsigned long  dest;     // IP-адрес назначения 
 }IPHeader;
 
-void listenFunThr(SOCKET &s);
+void listenFunThr(SOCKET &s,boolean &isRun);
 class NetShieldSniffer
 {
 private:
@@ -32,7 +32,8 @@ private:
 	char name[128];
 	HOSTENT* phe;
 	SOCKADDR_IN sa;
-	u_long flag = 1;
+	u_long flag;
+	boolean isRunning;
 public:
 	NetShieldSniffer();
 	~NetShieldSniffer();

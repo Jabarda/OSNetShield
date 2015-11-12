@@ -3,7 +3,9 @@
 
 
 NetShieldSniffer::NetShieldSniffer()
-{
+{	
+	flag = 1;
+	isRunning = true;
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
 	gethostname(name, sizeof(name));
@@ -22,27 +24,33 @@ NetShieldSniffer::~NetShieldSniffer()
 {
 }
 
-void listenFunThr(SOCKET &s){
-	while (true){
+void listenFunThr(SOCKET &s,boolean &isRunning){
+	std::cout << s << "\n";
+	while (isRunning){
 		int count;
+		count = select(s,)
 		count = recv(s, Buffer, sizeof(Buffer), 0);
+		std::cout << count << "\n";
 		if (count >= sizeof(IPHeader))
 		{
 			IPHeader* hdr = (IPHeader *)Buffer;
-			std::cout << hdr<<"\n";
+			std::cout << hdr << "\n";
 		}
-	}
+		std::cout << WSAGetLastError() << "\n";
+	}	
 }
+
 void NetShieldSniffer::startListen(){
 
-	std::thread t(listenFunThr, s);
+	std::thread t(listenFunThr, s,isRunning);
 	t.detach();
 		
 }
 
 void NetShieldSniffer::stopListen(){
-
+	isRunning = false;
 	closesocket(s);
 	WSACleanup();
+	
 }
 

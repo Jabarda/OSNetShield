@@ -9,7 +9,7 @@ int __cdecl main()
 	NetShieldSniffer mySniffa;
 	mySniffa.startListen();
 	std::cout << "Sniffer started sniffing\n";
-	mySniffa.stopListen();
+
 	std::string sName = "Name", sDescription = "Description", sGroup = "Group", sAddr = "0.0.0.0";
 
 	cFwAccess oFwChanger;
@@ -22,7 +22,7 @@ int __cdecl main()
 
 	while(menuAction != 3)
 	{
-		std::cout << vFwAddedRules.size() << "\n";
+		//std::cout << vFwAddedRules.size() << "\n";
 		for(int i=0; i<vFwAddedRules.size(); i++)
 			std::wcout << vFwAddedRules[i] << "\n";
 		std::cout << "\n1) Block IP\n2) Unblock IP\n3) Exit\n";
