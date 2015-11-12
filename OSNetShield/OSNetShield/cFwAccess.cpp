@@ -105,7 +105,7 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 		CLSCTX_INPROC_SERVER,
 		__uuidof(INetFwRule),
 		(void**)&pFwRule);
-   if (FAILED(hr))
+	if (FAILED(hr))
     {
         printf("CoCreateInstance for Firewall Rule failed: 0x%08lx\n", hr);
 		cleanup(
@@ -116,74 +116,8 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 		return;
     }
 	
-    // Populate the Firewall Rule object
-    pFwRule->put_Name(bstrRuleName);
-    pFwRule->put_Description(bstrRuleDescription);
-    pFwRule->put_Grouping(bstrRuleGroup);
-	pFwRule->put_RemoteAddresses(bstrRuleRemoteAdresses);
-    pFwRule->put_Profiles(NET_FW_PROFILE2_ALL);
-	pFwRule->put_Direction(dir);
-	pFwRule->put_Action(NET_FW_ACTION_BLOCK);
-	pFwRule->put_Enabled(VARIANT_TRUE);
-	
-	if (std::find(vFwAddedRules.begin(), vFwAddedRules.end(), std::wstring (bstrRuleName, SysStringLen(bstrRuleName))) == vFwAddedRules.end() && nAction == 1)
-	{
-		// Add the Firewall Rule
-		hr = pFwRules->Add(pFwRule);
-		if (FAILED(hr))
-		{
-			printf("Firewall Rule Add failed: 0x%08lx\n", hr);
-			cleanup(
-				bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-				pFwRule, pFwRules, pNetFwPolicy2,
-				hrComInit
-				);
-			return;
-		}
-		else
-		{
-			vFwAddedRules.push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
-			std::cout << "IP successfully blocked.\n";
-		}
-	}
-	else if (std::find(vFwAddedRules.begin(), vFwAddedRules.end(), std::wstring (bstrRuleName, SysStringLen(bstrRuleName))) != vFwAddedRules.end() && nAction == 1)
-	{
-		std::cout << "IP already blocked.\n";
-	}
-	else if (std::find(vFwAddedRules.begin(), vFwAddedRules.end(), std::wstring (bstrRuleName, SysStringLen(bstrRuleName))) != vFwAddedRules.end() && nAction == 2)
-	{
-		// Remove the Firewall Rule
-		hr = pFwRules->Remove(bstrRuleName);
-		if (FAILED(hr))
-		{
-			printf("Firewall Rule Remove failed: 0x%08lx\n", hr);
-			cleanup(
-				bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-				pFwRule, pFwRules, pNetFwPolicy2,
-				hrComInit
-				);
-			return;
-		}
-		else
-		{
-			std::cout << "IP successfully unblocked.\n";
-			for( std::vector<std::wstring>::iterator iter = vFwAddedRules.begin(); iter != vFwAddedRules.end(); ++iter )
-			{
-				if( *iter == std::wstring (bstrRuleName, SysStringLen(bstrRuleName)) )
-				{
-					vFwAddedRules.erase( iter );
-					break;
-				}
-			}
-		}
-	}
-	else if (std::find(vFwAddedRules.begin(), vFwAddedRules.end(), std::wstring (bstrRuleName, SysStringLen(bstrRuleName))) == vFwAddedRules.end() && nAction == 2)
-	{
-		std::cout << "No such rule.\n";
-	}
-
-	// Get the existing rule
-	if(nAction == 0)
+	// Enumerating rules
+	if(nAction == 0 || nAction == 2)
 	{
 		ULONG cFetched = 0; 
 		CComVariant var;
@@ -221,31 +155,102 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 				{
 					hr = var.ChangeType(VT_DISPATCH);
 				}
-				else
-					std::cout << 1;
+
 				if (SUCCEEDED(hr))
 				{
 					hr = (V_DISPATCH(&var))->QueryInterface(__uuidof(INetFwRule), reinterpret_cast<void**>(&pFwRule));
-				}
-				else
-					std::cout << 2;
-
+				}	
+			
 				if (SUCCEEDED(hr))
-					// Add rule name to the vector if it belongs to apps group
-					if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
+				{
+					switch(nAction)
 					{
-						if (bstrVal == SysAllocString(L"OSNetShield"))
-							if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
-							{
-								std::wcout << std::wstring (bstrVal, SysStringLen(bstrVal)) << std::endl;
-								vFwAddedRules.push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
-							}
-						SysFreeString(bstrVal);
+					case 0:
+						// Add rule name to the vector if it belongs to apps group
+						if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
+							if (std::wstring (bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
+								if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
+								{
+									vFwAddedRules.push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
+								}
+								break;
+					case 2:
+						// Remove rule if it belongs to apps group and blocks specified IP
+						if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
+							if (std::wstring (bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
+								if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal)))
+								{
+									std::string sMask = "/255.255.255.255";
+									if (std::wstring (bstrVal, SysStringLen(bstrVal)) == (bstrRuleRemoteAdresses+std::wstring (sMask.begin(), sMask.end())))
+										if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
+										{
+											hr = pFwRules->Remove(bstrVal);
+											if (FAILED(hr))
+											{
+												printf("Firewall Rule Remove failed: 0x%08lx\n", hr);
+												cleanup(
+													bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+													pFwRule, pFwRules, pNetFwPolicy2,
+													hrComInit
+													);
+												return;
+											}
+											else
+											{
+												std::cout << "IP successfully unblocked.\n";
+												for( std::vector<std::wstring>::iterator iter = vFwAddedRules.begin(); iter != vFwAddedRules.end(); ++iter )
+												{
+													if( *iter == std::wstring (bstrVal, SysStringLen(bstrVal)) )
+													{
+														vFwAddedRules.erase( iter );
+														break;
+													}
+												}
+											}
+										}
+								}
+					break;
 					}
+				}
 			}
 		}
+		cleanup(
+		bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+		pFwRule, pFwRules, pNetFwPolicy2,
+		hrComInit
+		);
+		return;
 	}
-
+	else if (nAction == 1)
+	{
+		// Populate the Firewall Rule object
+		pFwRule->put_Name(bstrRuleName);
+		pFwRule->put_Description(bstrRuleDescription);
+		pFwRule->put_Grouping(bstrRuleGroup);
+		pFwRule->put_RemoteAddresses(bstrRuleRemoteAdresses);
+		pFwRule->put_Profiles(NET_FW_PROFILE2_ALL);
+		pFwRule->put_Direction(dir);
+		pFwRule->put_Action(NET_FW_ACTION_BLOCK);
+		pFwRule->put_Enabled(VARIANT_TRUE);
+	
+		// Add the Firewall Rule
+		hr = pFwRules->Add(pFwRule);
+		if (FAILED(hr))
+		{
+			printf("Firewall Rule Add failed: 0x%08lx\n", hr);
+			cleanup(
+				bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+				pFwRule, pFwRules, pNetFwPolicy2,
+				hrComInit
+				);
+			return;
+		}
+		else
+		{
+			vFwAddedRules.push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
+			std::cout << "IP successfully blocked.\n";
+		}
+	}
 	cleanup(
 		bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
 		pFwRule, pFwRules, pNetFwPolicy2,
@@ -312,7 +317,6 @@ void cFwAccess::controlFw()
 	std::vector<std::wstring> vFwAddedRules;
 	
 	ruleMaker(sName, sDescription, sAddr, 0, vFwAddedRules, NET_FW_RULE_DIR_OUT);
-	ruleMaker(sName, sDescription, sAddr, 0, vFwAddedRules, NET_FW_RULE_DIR_IN);
 
 	std::cout << "The application blocks and unblocks a site by its IP\n";
 
@@ -335,10 +339,9 @@ void cFwAccess::controlFw()
 		}
 		else if(menuAction == 2)
 		{
-			std::cout << "Enter the rule name:\t";
-			std::getline(std::cin, sName);
-			ruleMaker(sName+"in", sDescription, sAddr, 2, vFwAddedRules, NET_FW_RULE_DIR_IN);
-			ruleMaker(sName+"out", sDescription, sAddr, 2, vFwAddedRules, NET_FW_RULE_DIR_OUT);
+			std::cout << "Enter the IP to unblock:\t";
+			std::getline(std::cin, sAddr);
+			ruleMaker(sName, sDescription, sAddr, 2, vFwAddedRules, NET_FW_RULE_DIR_IN);
 		}
 	}
 }
