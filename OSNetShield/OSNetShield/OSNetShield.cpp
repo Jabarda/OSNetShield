@@ -7,12 +7,10 @@ int __cdecl main()
 {
 	NetShieldSniffer mySniffa;
 	mySniffa.startListen();
-	std::cout << "Sniffer started sniffing\n";
-<<<<<<< HEAD
+	std::cout << "Sniffer started sniffing\n";	
 	mySniffa.stopListen();
 	std::string sName = "Name", sDescription = "Description", sGroup = "Group", sAddr = "0.0.0.0";
-=======
->>>>>>> refs/remotes/origin/WinFWDev
+
 
 	cFwAccess oFwChanger;
 	oFwChanger.controlFw();
