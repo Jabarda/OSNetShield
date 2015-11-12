@@ -1,12 +1,12 @@
-Приложение требуется запускать от имени администратора.
+You must run the program as administrator
 
 
-Цели проекта : Написать программу, способную выполнять поставленные проектом задачи.
+Goal: Write a program capable of accomplishing certain objectives.
 
-Задачи: 
-*Блокировка указанного ip
-*Блокировка указанной группы ip
-*Защита от нежелательных и вредоносных подключений
+Objectives: 
+*Blocking a specified ip
+*Blocking a specified group of ip's
+*Defence against unwanted and harmful connections
 
 
 ChangeLog:
@@ -17,4 +17,5 @@ Java with netsh warp :
 -release 12/11/2015
   *massive bug fixes
   +sniffer
-  +blocking unblocking inputed ip
+  +blocking and unblocking inputed ip
+  +test gui
