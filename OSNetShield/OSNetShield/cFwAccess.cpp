@@ -312,6 +312,7 @@ std::string cFwAccess::makeRuleName(std::vector<std::wstring> &vFwAddedRules)
 
 void cFwAccess::controlFw()
 {
+	// TODO: move to constructor
 	int menuAction = 0;
 	std::string sName = "Name", sDescription = "Block ", sAddr = "0.0.0.0";
 	std::vector<std::wstring> vFwAddedRules;
