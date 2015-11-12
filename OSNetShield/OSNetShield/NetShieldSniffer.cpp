@@ -28,15 +28,19 @@ void listenFunThr(SOCKET &s,boolean &isRunning){
 	std::cout << s << "\n";
 	while (isRunning){
 		int count;
-		count = select(s,)
 		count = recv(s, Buffer, sizeof(Buffer), 0);
-		std::cout << count << "\n";
+		std::cout << "count:" << count<< "\n";
 		if (count >= sizeof(IPHeader))
 		{
 			IPHeader* hdr = (IPHeader *)Buffer;
-			std::cout << hdr << "\n";
+
+			std::cout << "id:" << hdr->id << "\n";
+			std::cout << "Src:" << hdr->src<<"\n";
+			std::cout << "dest:" << hdr->dest << "\n\n";
+			count = -1;
 		}
-		std::cout << WSAGetLastError() << "\n";
+		//std::cout <<"Last Erorr:"<< WSAGetLastError() << "\n";
+		
 	}	
 }
 
@@ -44,7 +48,7 @@ void NetShieldSniffer::startListen(){
 
 	std::thread t(listenFunThr, s,isRunning);
 	t.detach();
-		
+	std::cout << "starting thread\n";
 }
 
 void NetShieldSniffer::stopListen(){
