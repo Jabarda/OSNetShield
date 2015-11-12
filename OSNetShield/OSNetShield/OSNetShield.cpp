@@ -10,18 +10,17 @@
 
 void thread_Proc()
 {
-	mainForm *ok = new mainForm();
-	ok->WinMain(NULL, NULL, NULL, 1);
+	Basic_window window;
+	window.DoModal();
 }
 
 int __cdecl main()
 {
 	AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0);
-	Basic_window window;
-	window.DoModal();
 	
 	
-	//std::thread thr(thread_Proc);
+	
+	std::thread thr(thread_Proc);
 	/*
 	NetShieldSniffer mySniffa;
 	mySniffa.startListen();
