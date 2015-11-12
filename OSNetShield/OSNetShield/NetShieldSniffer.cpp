@@ -4,6 +4,8 @@
 
 NetShieldSniffer::NetShieldSniffer()
 {
+	flag = 1;
+
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
 	gethostname(name, sizeof(name));
@@ -26,10 +28,18 @@ void listenFunThr(SOCKET &s){
 	while (true){
 		int count;
 		count = recv(s, Buffer, sizeof(Buffer), 0);
+<<<<<<< HEAD
 		if (count >= sizeof(IPHeader))
 		{
 			IPHeader* hdr = (IPHeader *)Buffer;
 			std::cout << hdr<<"\n";
+=======
+		//std::cout << "cycleiter";
+		if (count >= sizeof(IPHeader))
+		{
+			IPHeader* hdr = (IPHeader *)Buffer;
+			//std::cout << hdr;
+>>>>>>> refs/remotes/origin/WinFWDev
 		}
 	}
 }
