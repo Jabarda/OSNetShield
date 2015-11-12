@@ -47,6 +47,11 @@ int __cdecl main()
 			oFwChanger.ruleMaker(sName, sDescription, sGroup, sAddr, 2, vFwAddedRules);
 		}
 	}
+=======
+
+	cFwAccess oFwChanger;
+	oFwChanger.controlFw();
+>>>>>>> WinFWDev
 
     return 0;
 }
