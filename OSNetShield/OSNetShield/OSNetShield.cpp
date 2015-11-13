@@ -1,15 +1,22 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include "NetShieldSniffer.h"
-#include "cFwAccess.h"
+#include "Basic_window.h"
+//#include "cFwAccess.h"
 
 int __cdecl main()
 {
-	int menuAction = 0;
+	AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0);
+
+	cFwAccess oFwChanger;
+
+	std::thread thr(thread_Proc, &oFwChanger);
+	thr.detach();
+
 	NetShieldSniffer mySniffa;
 	mySniffa.startListen();
 	std::cout << "Sniffer started sniffing\n";
-	cFwAccess oFwChanger;
+
 	oFwChanger.controlFw();
 
     return 0;

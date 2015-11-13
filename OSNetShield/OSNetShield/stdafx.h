@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <afxcontrolbars.h>
+
+#include <string>
+
 
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы

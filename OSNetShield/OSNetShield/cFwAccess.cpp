@@ -28,14 +28,15 @@ HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
 
 cFwAccess::cFwAccess(void)
 {
-
+	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
+	ruleMaker(sName, sDescription, sAddr, 0, NET_FW_RULE_DIR_OUT);
 }
 
 cFwAccess::~cFwAccess(void)
 {
 }
 
-void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &sAddr, int nAction, std::vector<std::wstring> &vFwAddedRules, NET_FW_RULE_DIRECTION_ dir)
+void cFwAccess::ruleMaker(std::wstring &sName, std::wstring &sDscr, std::wstring &sAddr, int nAction, NET_FW_RULE_DIRECTION_ dir)
 {
 	HRESULT hrComInit = S_OK;
     HRESULT hr = S_OK;
@@ -44,10 +45,10 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
     INetFwRules *pFwRules = NULL;
     INetFwRule *pFwRule = NULL;
 
-	BSTR bstrRuleName = SysAllocString(std::wstring(sName.begin(), sName.end()).c_str());
-	BSTR bstrRuleDescription = SysAllocString(std::wstring(sDscr.begin(), sDscr.end()).c_str());
+	BSTR bstrRuleName = SysAllocString(sName.c_str());
+	BSTR bstrRuleDescription = SysAllocString(sDscr.c_str());
     BSTR bstrRuleGroup = SysAllocString(L"OSNetShield");
-	BSTR bstrRuleRemoteAdresses = SysAllocString(std::wstring(sAddr.begin(), sAddr.end()).c_str());
+	BSTR bstrRuleRemoteAdresses = SysAllocString(sAddr.c_str());
 	BSTR bstrVal = SysAllocString(L"value");
 
 	// Initialize COM.
@@ -170,10 +171,8 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 						if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
 							if (std::wstring (bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
 								if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
-								{
-									vFwAddedRules.push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
-								}
-								break;
+									(this->vFwAddedRules).push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
+						break;
 					case 2:
 						// Remove rule if it belongs to apps group and blocks specified IP
 						if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
@@ -198,11 +197,11 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 											else
 											{
 												std::cout << "IP successfully unblocked.\n";
-												for( std::vector<std::wstring>::iterator iter = vFwAddedRules.begin(); iter != vFwAddedRules.end(); ++iter )
+												for( std::vector<std::wstring>::iterator iter = (this->vFwAddedRules).begin(); iter != (this->vFwAddedRules).end(); ++iter )
 												{
 													if( *iter == std::wstring (bstrVal, SysStringLen(bstrVal)) )
 													{
-														vFwAddedRules.erase( iter );
+														(this->vFwAddedRules).erase( iter );
 														break;
 													}
 												}
@@ -247,7 +246,7 @@ void cFwAccess::ruleMaker(std::string &sName, std::string &sDscr, std::string &s
 		}
 		else
 		{
-			vFwAddedRules.push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
+			(this->vFwAddedRules).push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
 			std::cout << "IP successfully blocked.\n";
 		}
 	}
@@ -295,29 +294,25 @@ void cFwAccess::cleanup(
     }
 }
 
-std::string cFwAccess::makeRuleName(std::vector<std::wstring> &vFwAddedRules)
+std::wstring cFwAccess::makeRuleName()
 {
-	std::string sName, sNameTemp;
+	std::wstring sName, sNameTemp;
 
-	for(int i=1; i<=vFwAddedRules.size()+1; i++)
+	for(int i=1; i<=(this->vFwAddedRules).size()+1; i++)
 	{
-		sName = "OSNetShield" + std::to_string(i);
-		sNameTemp = sName + "in";
-		if(std::find(vFwAddedRules.begin(), vFwAddedRules.end(), (std::wstring(sNameTemp.begin(), sNameTemp.end()))) == vFwAddedRules.end())
+		sName = std::wstring(L"OSNetShield") + std::to_wstring(i);
+		sNameTemp = sName + std::wstring(L"in");
+		if(std::find((this->vFwAddedRules).begin(), (this->vFwAddedRules).end(), sNameTemp) == (this->vFwAddedRules).end())
 			return sName;
 	}
-	sName = "OSNetShield" + std::to_string(vFwAddedRules.size()+1);
+	sName = std::wstring(L"OSNetShield") + std::to_wstring((this->vFwAddedRules).size()+1);
 	return sName;
 }
 
 void cFwAccess::controlFw()
 {
-	// TODO: move to constructor
 	int menuAction = 0;
-	std::string sName = "Name", sDescription = "Block ", sAddr = "0.0.0.0";
-	std::vector<std::wstring> vFwAddedRules;
-	
-	ruleMaker(sName, sDescription, sAddr, 0, vFwAddedRules, NET_FW_RULE_DIR_OUT);
+	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
 
 	std::cout << "The application blocks and unblocks a site by its IP\n";
 
@@ -328,21 +323,39 @@ void cFwAccess::controlFw()
 		getchar();
 		if(menuAction == 1)
 		{
-			sName = makeRuleName(vFwAddedRules);
+			sName = makeRuleName();
 			std::cout << "Enter the IP to block:\t";
-			std::getline(std::cin, sAddr);
-			std::cout << "The rule name is " << sName << "\n";
-			sDescription = "Block " + sAddr;
-			std::cout << "The rule description is " << sDescription << "\n";
-			std::cout << "The rule group is OSNetShield\n";
-			ruleMaker(sName+"in", sDescription, sAddr, 1, vFwAddedRules, NET_FW_RULE_DIR_IN);
-			ruleMaker(sName+"out", sDescription, sAddr, 1, vFwAddedRules, NET_FW_RULE_DIR_OUT);
+			std::getline(std::wcin, sAddr);
+			std::wcout << "The rule name is " << sName << "\n";
+			sDescription = sDescription + sAddr;
+			std::wcout << "The rule description is " << sDescription << "\n";
+			std::wcout << "The rule group is OSNetShield\n";
+			ruleMaker(sName+std::wstring(L"in"), sDescription, sAddr, 1, NET_FW_RULE_DIR_IN);
+			ruleMaker(sName+std::wstring(L"out"), sDescription, sAddr, 1, NET_FW_RULE_DIR_OUT);
 		}
 		else if(menuAction == 2)
 		{
 			std::cout << "Enter the IP to unblock:\t";
-			std::getline(std::cin, sAddr);
-			ruleMaker(sName, sDescription, sAddr, 2, vFwAddedRules, NET_FW_RULE_DIR_IN);
+			std::getline(std::wcin, sAddr);
+			ruleMaker(sName, sDescription, sAddr, 2, NET_FW_RULE_DIR_IN);
 		}
+	}
+}
+
+void cFwAccess::controlFwGUI(std::wstring &sIP, int nAction)
+{
+	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
+
+	if(nAction == 1){
+		sName = makeRuleName();
+		sAddr = sIP;
+		sDescription = sDescription + sAddr;
+		ruleMaker(sName+std::wstring(L"in"), sDescription, sAddr, 1, NET_FW_RULE_DIR_IN);
+		ruleMaker(sName+std::wstring(L"out"), sDescription, sAddr, 1, NET_FW_RULE_DIR_OUT);
+	}
+	else if(nAction == 2)
+	{
+		sAddr = sIP;
+		ruleMaker(sName, sDescription, sAddr, 2, NET_FW_RULE_DIR_IN);
 	}
 }
