@@ -10,9 +10,12 @@
 
 IMPLEMENT_DYNAMIC(Basic_window, CDialogEx)
 
+
 Basic_window::Basic_window(CWnd* pParent /*=NULL*/)
 	: CDialog(Basic_window::IDD, pParent)
+	, text_blablalba(_T(""))
 {
+	CString text_edit2;
 }
 
 Basic_window::~Basic_window()
@@ -38,15 +41,20 @@ END_MESSAGE_MAP()
 
 void Basic_window::OnBnClickedBlock()
 {
+	CString s;
+	GetDlgItem(IDC_EDIT2)->GetWindowText(s);
 	// TODO: добавьте свой код обработчика уведомлений
-	std::cout << "Block clicked";
+	
+	std::wcout << "Block clicked   " << s.GetString() << "   " << s.GetLength();
 	
 }
 
 
 void Basic_window::OnBnClickedUnblock()
 {
-	std::cout << "Block clicked";
+	CString s;
+	GetDlgItem(IDC_EDIT2)->GetWindowText(s);
+	std::cout << "UnBlock clicked   " << *s;
 	// TODO: добавьте свой код обработчика уведомлений
 	
 }
@@ -59,6 +67,7 @@ void Basic_window::OnEnChangeEdit1()
 	// function and call CRichEditCtrl().SetEventMask()
 	// with the ENM_CHANGE flag ORed into the mask.
 
+
 	// TODO:  Добавьте код элемента управления
 }
 
@@ -68,7 +77,6 @@ void Basic_window::OnEnChangeEdit2()
 	// TODO:  Если это элемент управления RICHEDIT, то элемент управления не будет
 	// send this notification unless you override the CDialog::OnInitDialog()
 	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
 
 	// TODO:  Добавьте код элемента управления
 }

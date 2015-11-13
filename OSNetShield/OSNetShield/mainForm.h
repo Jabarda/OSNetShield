@@ -3,6 +3,7 @@
 class mainForm
 {
 public:
+	CString text;
 	mainForm();
 	void Button_Block_Clicked();
 	int WINAPI WinMain(HINSTANCE hInst, // дескриптор экземпляра приложения

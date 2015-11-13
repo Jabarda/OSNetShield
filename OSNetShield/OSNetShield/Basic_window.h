@@ -24,4 +24,7 @@ public:
 	afx_msg void OnBnClickedUnblock();
 	afx_msg void OnEnChangeEdit1();
 	afx_msg void OnEnChangeEdit2();
+	CString text_edit2;
+	CString text;
+	CString text_blablalba;
 };
