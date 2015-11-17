@@ -1,10 +1,10 @@
 
-//TODO: change removal: enumerating instead of item method
 //TODO: make proper descrirtion
+//TODO: UNBLOCK RANGE OF IPS
+//range doesn't use mask
 
 #include "stdafx.h"
 #include "cFwAccess.h"
-
 
 // Instantiate INetFwPolicy2
 HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
@@ -26,17 +26,81 @@ HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
     return hr;
 }
 
+
+
+cIP::cIP(std::wstring &str)
+{
+	int nTemp = 0, nCount = 0;
+	for(int i = 0; i < str.length(); i++)
+	{
+		if(str[i] >= 48 && str[i] <= 57)
+		{
+			nTemp = nTemp * 10;
+			nTemp = nTemp + std::stoi(std::to_wstring(str[i]));
+		}
+		else if(str[i] == 46)
+		{
+			nOctet[nCount] = nTemp;
+			nTemp = 0;
+			nCount++;
+		}
+	}
+	sAddr = std::to_wstring(nOctet[0]);
+	for(int i = 1; i < 4; i++)
+	{
+		sAddr += std::to_wstring('.');
+		sAddr += std::to_wstring(nOctet[i]);
+	}
+}
+
+cIP::~cIP()
+{
+
+}
+
+std::wstring cIP::getAddress()
+{
+	return sAddr;
+}
+
+bool cIP::operator >=(cIP &toCompare)
+{
+	if(this->nOctet[0] > toCompare.nOctet[0])
+		return true;
+	else if(this->nOctet[0] == toCompare.nOctet[0])
+		if(this->nOctet[1] > toCompare.nOctet[1])
+			return true;
+		else if(this->nOctet[1] == toCompare.nOctet[1])
+			if(this->nOctet[2] > toCompare.nOctet[2])
+				return true;
+			else if(this->nOctet[2] == toCompare.nOctet[2])
+				if(this->nOctet[3] >= toCompare.nOctet[3])
+					return true;
+	return false;
+}
+
+bool cIP::operator ==(cIP &toCompare)
+{
+	if(this->sAddr == toCompare.sAddr)
+		return true;
+	return false;
+}
+
+
+
 cFwAccess::cFwAccess(void)
 {
 	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
-	ruleMaker(sName, sDescription, sAddr, 0, NET_FW_RULE_DIR_OUT);
+	makeRule(sName, sDescription, sAddr, 0, NET_FW_RULE_DIR_OUT);
 }
 
 cFwAccess::~cFwAccess(void)
 {
 }
 
-void cFwAccess::ruleMaker(std::wstring &sName, std::wstring &sDscr, std::wstring &sAddr, int nAction, NET_FW_RULE_DIRECTION_ dir)
+// Adding (nAction = 1), removing rules (nAction = 2)
+// Filling vFwAddedRules with previously added rules (nAction = 0) (used for proper naming)
+void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring &sAddr, int nAction, NET_FW_RULE_DIRECTION_ dir)
 {
 	HRESULT hrComInit = S_OK;
     HRESULT hr = S_OK;
@@ -248,6 +312,8 @@ void cFwAccess::ruleMaker(std::wstring &sName, std::wstring &sDscr, std::wstring
 		{
 			(this->vFwAddedRules).push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
 			std::cout << "IP successfully blocked.\n";
+			pFwRule->get_RemoteAddresses(&bstrVal);
+			std::wcout << std::wstring (bstrVal, SysStringLen(bstrVal)) << std::endl;
 		}
 	}
 	cleanup(
@@ -294,6 +360,8 @@ void cFwAccess::cleanup(
     }
 }
 
+// Naming the rule, based on the number of previously added rules
+// New name has to be unique
 std::wstring cFwAccess::makeRuleName()
 {
 	std::wstring sName, sNameTemp;
@@ -309,6 +377,7 @@ std::wstring cFwAccess::makeRuleName()
 	return sName;
 }
 
+// Manipulate the rules using console
 void cFwAccess::controlFw()
 {
 	int menuAction = 0;
@@ -330,18 +399,19 @@ void cFwAccess::controlFw()
 			sDescription = sDescription + sAddr;
 			std::wcout << "The rule description is " << sDescription << "\n";
 			std::wcout << "The rule group is OSNetShield\n";
-			ruleMaker(sName+std::wstring(L"in"), sDescription, sAddr, 1, NET_FW_RULE_DIR_IN);
-			ruleMaker(sName+std::wstring(L"out"), sDescription, sAddr, 1, NET_FW_RULE_DIR_OUT);
+			makeRule(sName+std::wstring(L"in"), sDescription, sAddr, 1, NET_FW_RULE_DIR_IN);
+			makeRule(sName+std::wstring(L"out"), sDescription, sAddr, 1, NET_FW_RULE_DIR_OUT);
 		}
 		else if(menuAction == 2)
 		{
 			std::cout << "Enter the IP to unblock:\t";
 			std::getline(std::wcin, sAddr);
-			ruleMaker(sName, sDescription, sAddr, 2, NET_FW_RULE_DIR_IN);
+			makeRule(sName, sDescription, sAddr, 2, NET_FW_RULE_DIR_IN);
 		}
 	}
 }
 
+// Manipulate the rules using GUI
 void cFwAccess::controlFwGUI(std::wstring &sIP, int nAction)
 {
 	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
@@ -350,12 +420,51 @@ void cFwAccess::controlFwGUI(std::wstring &sIP, int nAction)
 		sName = makeRuleName();
 		sAddr = sIP;
 		sDescription = sDescription + sAddr;
-		ruleMaker(sName+std::wstring(L"in"), sDescription, sAddr, 1, NET_FW_RULE_DIR_IN);
-		ruleMaker(sName+std::wstring(L"out"), sDescription, sAddr, 1, NET_FW_RULE_DIR_OUT);
+		// Checking if input is *.*.*.
+		/*
+		if(isWstringIP(sAddr))
+		{
+			cIP oIPAddress(sAddr);
+			makeRule(sName+std::wstring(L"in"), sDescription, oIPAddress.getAddress(), 1, NET_FW_RULE_DIR_IN);
+			makeRule(sName+std::wstring(L"out"), sDescription, oIPAddress.getAddress(), 1, NET_FW_RULE_DIR_OUT);
+		}
+		else
+			std::cout << "Inappropriate input\n";
+			*/
+		makeRule(sName+std::wstring(L"in"), sDescription, sAddr, 1, NET_FW_RULE_DIR_IN);
+		makeRule(sName+std::wstring(L"out"), sDescription, sAddr, 1, NET_FW_RULE_DIR_OUT);
 	}
 	else if(nAction == 2)
 	{
 		sAddr = sIP;
-		ruleMaker(sName, sDescription, sAddr, 2, NET_FW_RULE_DIR_IN);
+		makeRule(sName, sDescription, sAddr, 2, NET_FW_RULE_DIR_IN);
 	}
+}
+
+// Determine if the wstring can be interpreted as an IP
+bool cFwAccess::isWstringIP(std::wstring &str)
+{
+	int nTemp = 0, nCount = 0;
+	for(int i = 0; i < str.length(); i++)
+	{
+		if(str[i] >= 48 && str[i] <= 57)
+		{
+			nTemp = nTemp * 10;
+			nTemp += str[i] - 48;
+		}
+		else if(str[i] == 46)
+			if(nTemp >= 0 && nTemp <= 255 && nCount < 4)
+			{
+				nTemp = 0;
+				nCount++;
+			}
+			else
+				return false;
+		else
+			return false;
+	}
+	if(nTemp >= 0 && nTemp <= 255 && nCount == 3)
+		return true;
+	else
+		return false;
 }
