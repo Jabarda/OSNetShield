@@ -19,8 +19,8 @@ public:
 	cIP(std::wstring &str);
 	~cIP();
 	std::wstring getAddress();
-	bool operator >=(cIP &toCompare);
-	bool operator ==(cIP &toCompare);
+	void operator ++();
+	void operator --();
 private:
 	int nOctet[4];
 	std::wstring sAddr;
@@ -36,8 +36,11 @@ public:
 	void cleanup(
 		BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, BSTR &bstrVal,
 		INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
-		HRESULT &hrComInit
-		);
+		HRESULT &hrComInit);
+	void makeRuleHelper(
+		BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, BSTR &bstrVal,
+		INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
+		HRESULT &hrComInit, HRESULT &hr);
 	std::wstring makeRuleName();
 	void controlFw();
 	void controlFwGUI(std::wstring &sIP, int nAction);
