@@ -13,6 +13,7 @@
 #include <afxcontrolbars.h>
 
 #include <string>
+#include <afxwin.h>
 
 
 
