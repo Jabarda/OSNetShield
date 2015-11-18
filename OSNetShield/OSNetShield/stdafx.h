@@ -9,7 +9,10 @@
 
 #include <stdio.h>
 #include <tchar.h>
+
 #include <afxcontrolbars.h>
+
+#include <string>
 
 
 

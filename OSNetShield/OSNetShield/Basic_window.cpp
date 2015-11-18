@@ -6,16 +6,21 @@
 #include "afxdialogex.h"
 #include <iostream>
 
+void thread_Proc(cFwAccess *pFwAccessIn)
+{
+	Basic_window window(pFwAccessIn);
+	window.DoModal();
+}
+
 // диалоговое окно Basic_window
 
 IMPLEMENT_DYNAMIC(Basic_window, CDialogEx)
 
 
-Basic_window::Basic_window(CWnd* pParent /*=NULL*/)
+Basic_window::Basic_window(cFwAccess *pFwAccessIn, CWnd* pParent /*=NULL*/)
 	: CDialog(Basic_window::IDD, pParent)
-	, text_blablalba(_T(""))
 {
-	CString text_edit2;
+	pFwAccess = pFwAccessIn;
 }
 
 Basic_window::~Basic_window()
@@ -42,21 +47,20 @@ END_MESSAGE_MAP()
 void Basic_window::OnBnClickedBlock()
 {
 	CString s;
-	GetDlgItem(IDC_EDIT2)->GetWindowText(s);
+	GetDlgItem(IDC_EDIT1)->GetWindowText(s);
 	// TODO: добавьте свой код обработчика уведомлений
-	
-	std::wcout << "Block clicked   " << s.GetString() << "   " << s.GetLength();
-	
+	if(s.GetLength() != 0)
+		pFwAccess->controlFwGUI(std::wstring(s), 1);
 }
 
 
 void Basic_window::OnBnClickedUnblock()
 {
 	CString s;
-	GetDlgItem(IDC_EDIT2)->GetWindowText(s);
-	std::cout << "UnBlock clicked   " << *s;
+	GetDlgItem(IDC_EDIT1)->GetWindowText(s);
 	// TODO: добавьте свой код обработчика уведомлений
-	
+
+	pFwAccess->controlFwGUI(std::wstring(s), 2);
 }
 
 
