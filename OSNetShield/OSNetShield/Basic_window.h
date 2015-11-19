@@ -31,4 +31,6 @@ public:
 
 private:
 	cFwAccess *pFwAccess;
+public:
+	afx_msg void OnBnClickedButton1();
 };

@@ -5,7 +5,8 @@
 #include "Basic_window.h"
 #include "afxdialogex.h"
 #include <iostream>
-
+#include "TCPForm.h"
+#include "thread"
 void thread_Proc(cFwAccess *pFwAccessIn)
 {
 	Basic_window window(pFwAccessIn);
@@ -38,6 +39,7 @@ BEGIN_MESSAGE_MAP(Basic_window, CDialog)
 	ON_BN_CLICKED(IDUnblock, &Basic_window::OnBnClickedUnblock)
 	ON_EN_CHANGE(IDC_EDIT1, &Basic_window::OnEnChangeEdit1)
 	ON_EN_CHANGE(IDC_EDIT2, &Basic_window::OnEnChangeEdit2)
+	ON_BN_CLICKED(IDC_BUTTON1, &Basic_window::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -83,4 +85,12 @@ void Basic_window::OnEnChangeEdit2()
 	// function and call CRichEditCtrl().SetEventMask()
 
 	// TODO:  Добавьте код элемента управления
+}
+
+
+void Basic_window::OnBnClickedButton1()
+{
+	std::thread TCPwindow(thread_Proc2);
+	TCPwindow.detach();
+	// TODO: добавьте свой код обработчика уведомлений
 }
