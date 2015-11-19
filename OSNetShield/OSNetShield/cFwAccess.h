@@ -1,10 +1,9 @@
-#include "stdafx.h"
 #include <windows.h>
 #include <netfw.h>
-//#include <iostream>
+#include <iostream>
 #include <vector>
 #include "atlstr.h"
-#include "TCPForm.h"
+
 #pragma once
 #pragma comment( lib, "ole32.lib" )
 #pragma comment( lib, "oleaut32.lib" )
@@ -20,13 +19,13 @@ public:
 	cIP(std::wstring &str);
 	~cIP();
 	std::wstring getAddress();
-	bool operator >=(cIP &toCompare);
-	bool operator ==(cIP &toCompare);
+	void operator ++();
+	void operator --();
 private:
 	int nOctet[4];
 	std::wstring sAddr;
 };
-//void TCPWindow_start();
+
 // Class to manipulate Windows Firewall
 class cFwAccess
 {
@@ -37,8 +36,11 @@ public:
 	void cleanup(
 		BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, BSTR &bstrVal,
 		INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
-		HRESULT &hrComInit
-		);
+		HRESULT &hrComInit);
+	void makeRuleHelper(
+		BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, BSTR &bstrVal,
+		INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
+		HRESULT &hrComInit, HRESULT &hr);
 	std::wstring makeRuleName();
 	void controlFw();
 	void controlFwGUI(std::wstring &sIP, int nAction);

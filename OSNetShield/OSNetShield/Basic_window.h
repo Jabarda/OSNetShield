@@ -1,8 +1,7 @@
 #pragma once
 #include "resource.h"
 #include "cFwAccess.h"
-//#include "TCPForm.h"
-//#include <thread>
+
 // диалоговое окно Basic_window
 
 void thread_Proc(cFwAccess *pFwAccessIn);
