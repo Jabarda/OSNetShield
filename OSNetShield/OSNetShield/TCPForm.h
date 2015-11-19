@@ -10,6 +10,7 @@ class TCPForm : public CDialog
 
 public:
 	TCPForm(CWnd* pParent = NULL);   // стандартный конструктор
+	void TCPForm::HideLabel();
 	virtual ~TCPForm();
 
 // Данные диалогового окна
@@ -21,4 +22,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedButton1();
 };

@@ -5,8 +5,9 @@
 #include "Basic_window.h"
 #include "afxdialogex.h"
 #include <iostream>
-#include "TCPForm.h"
-#include <thread>
+//#include "TCPForm.h"
+//#include <thread>
+
 
 void thread_Proc(cFwAccess *pFwAccessIn)
 {
@@ -91,6 +92,9 @@ void Basic_window::OnEnChangeEdit2()
 
 void Basic_window::OnBnClickedButton1()
 {
-	std::thread thr(thread_Proc2);
+	//TCPWindow_start();
+	std::thread TCPwindow(thread_Proc2);
+	TCPwindow.detach();
+	//std::thread TCPwindow(thread_Proc2);
 	// TODO: добавьте свой код обработчика уведомлений
 }

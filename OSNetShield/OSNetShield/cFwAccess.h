@@ -1,9 +1,10 @@
+#include "stdafx.h"
 #include <windows.h>
 #include <netfw.h>
-#include <iostream>
+//#include <iostream>
 #include <vector>
 #include "atlstr.h"
-
+#include "TCPForm.h"
 #pragma once
 #pragma comment( lib, "ole32.lib" )
 #pragma comment( lib, "oleaut32.lib" )
@@ -25,7 +26,7 @@ private:
 	int nOctet[4];
 	std::wstring sAddr;
 };
-
+//void TCPWindow_start();
 // Class to manipulate Windows Firewall
 class cFwAccess
 {

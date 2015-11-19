@@ -14,7 +14,8 @@
 
 #include <string>
 #include <afxwin.h>
-
+#include <thread>
+#include <iostream>
 
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы

@@ -26,8 +26,13 @@ HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2)
     return hr;
 }
 
-
-
+/*
+void TCPWindow_start()
+{
+	std::thread TCPwindow(thread_Proc2);
+	TCPwindow.detach();
+}
+*/
 cIP::cIP(std::wstring &str)
 {
 	int nTemp = 0, nCount = 0;
