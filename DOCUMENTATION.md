@@ -19,3 +19,10 @@ Java with netsh warp :
   +sniffer
   +blocking and unblocking inputed ip
   +test gui
+-release 19/11/2015
+  *fixed bugged unblocking of ip range
+  -commented sniffer - raw socket is inconvenient to work with
+  +active tcp connections review
+  +when user tries to unblock a certain ip from a blocked range it is properly unblocked and other ips from range stay  untouched
+  TODO put the code in order (it's really nasty)
+  TODO add similar option as the last one but for ip ranges (partly unblock ip range) - almost done
