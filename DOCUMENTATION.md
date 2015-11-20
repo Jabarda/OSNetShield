@@ -1,9 +1,4 @@
 You must run the program as administrator
 
+Use this program at your own risk
 
-Goal: Write a program capable of accomplishing certain objectives.
-
-Objectives: 
-*Blocking a specified ip
-*Blocking a specified group of ip's
-*Defence against unwanted and harmful connections
