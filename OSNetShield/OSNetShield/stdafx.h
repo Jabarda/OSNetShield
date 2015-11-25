@@ -16,6 +16,11 @@
 #include <afxwin.h>
 #include <thread>
 #include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <conio.h>
+#include <set>
 
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы
