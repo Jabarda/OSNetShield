@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Файлы исходного кода\TCP">
+      <UniqueIdentifier>{eacb60f4-1438-45c0-9220-7318ff58d8d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\TCP">
+      <UniqueIdentifier>{0a17440b-602e-4486-940b-deee743fdc64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Window">
+      <UniqueIdentifier>{48a863ef-8707-422f-95ad-39761aeebdfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -27,17 +36,17 @@
     <ClInclude Include="cFwAccess.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="Basic_window.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="TCPForm.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Заголовочные файлы\TCP</Filter>
     </ClInclude>
     <ClInclude Include="TCPTabel.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Заголовочные файлы\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Заголовочные файлы\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Basic_window.h">
+      <Filter>Заголовочные файлы\Window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,10 +63,10 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="TCPForm.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Файлы исходного кода\TCP</Filter>
     </ClCompile>
     <ClCompile Include="TCPTabel.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Файлы исходного кода\TCP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
