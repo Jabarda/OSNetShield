@@ -86,6 +86,9 @@
   <ItemGroup>
     <ClInclude Include="Basic_window.h" />
     <ClInclude Include="cFwAccess.h" />
+    <ClInclude Include="CountryDataDialog.h" />
+    <ClInclude Include="Country_Data.h" />
+    <ClInclude Include="NetShieldSniffer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -95,6 +98,9 @@
   <ItemGroup>
     <ClCompile Include="Basic_window.cpp" />
     <ClCompile Include="cFwAccess.cpp" />
+    <ClCompile Include="CountryDataDialog.cpp" />
+    <ClCompile Include="Country_Data.cpp" />
+    <ClCompile Include="NetShieldSniffer.cpp" />
     <ClCompile Include="OSNetShield.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -160,3 +160,5 @@ $RECYCLE.BIN/
 .DS_Store
 EasyFirewall/.idea/workspace.xml
 EasyFirewall/.idea/vcs.xml
+
+*.data
