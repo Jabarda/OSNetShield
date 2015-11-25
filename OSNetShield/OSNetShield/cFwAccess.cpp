@@ -131,7 +131,7 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 {
 	std::size_t foundRule, foundIP;
 
-	std::wstring sTemp1, sTemp2;
+	std::wstring wsRuleIP, wsUserIP;
 
 	HRESULT hrComInit = S_OK;
     HRESULT hr = S_OK;
@@ -259,221 +259,197 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 			
 				if (SUCCEEDED(hr))
 				{
+					if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
+					if (std::wstring(bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
+					if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal)))
 					switch(nAction)
 					{
-					case 0:
-						// Add rule name to the vector if it belongs to apps group
-						if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
-							if (std::wstring (bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
-								if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
-									(this->vFwAddedRules).push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
+					case 0:// Add rule name to the vector if it belongs to apps 
+							(this->vFwAddedRules).push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
 						break;
-					case 2:
-						// Remove rule if it belongs to apps group and blocks specified IP
-						if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
-							if (std::wstring (bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
-								if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal)))
+					case 2:// Remove rule if it belongs to apps group and blocks specified IP
+							wsRuleIP = std::wstring(bstrVal, SysStringLen(bstrVal));
+							wsUserIP = std::wstring(bstrRuleRemoteAdresses, SysStringLen(bstrRuleRemoteAdresses));
+
+							if (wsRuleIP == wsUserIP)
+								RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+								pFwRule, pFwRules, pNetFwPolicy2,
+								hrComInit, hr);
+							else
+							{
+								foundRule = wsRuleIP.find('-');
+								foundIP = wsUserIP.find('-');
+								if (foundIP == std::string::npos)// if no "-" in user input (ip is single)
 								{
-									sTemp1 = std::wstring(bstrVal, SysStringLen(bstrVal));
-									sTemp2 = std::wstring(bstrRuleRemoteAdresses, SysStringLen(bstrRuleRemoteAdresses));
-
-									foundRule = sTemp1.find('-');
-									foundIP = sTemp2.find('-');
-
-									if(foundIP == std::string::npos)
+									if (foundRule != std::string::npos) // if "-" found in ruleIP
 									{
-										if(sTemp1 == sTemp2)
-											makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-												pFwRule, pFwRules,  pNetFwPolicy2,
-												hrComInit, hr);
-										else if(foundRule != std::string::npos)
+										wsUserIP = wsUserIP.substr(0, wsUserIP.find('/'));//cut the mask 
+										if (!(wsUserIP < wsRuleIP.substr(0, foundRule) || wsUserIP > wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1)))//if ip in range
 										{
-											sTemp2 = sTemp2.substr(0, sTemp2.find('/'));
-											if(!(sTemp2 < sTemp1.substr(0, foundRule) || sTemp2 > sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1)))
+											if (wsUserIP == wsRuleIP.substr(0, foundRule))
 											{
-												if(sTemp2 == sTemp1.substr(0, foundRule))
+												RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+													pFwRule, pFwRules, pNetFwPolicy2,
+													hrComInit, hr);
+
+												cIP ipTemp(wsUserIP);
+												++ipTemp;
+												if (ipTemp.getAddress() != wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1))
+													wsUserIP = ipTemp.getAddress() + L"-" + wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1);
+												else{
+													wsUserIP = ipTemp.getAddress();
+												}
+												sName = makeRuleName();
+												sDscr = L"Block " + wsUserIP;
+												makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+												makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+											}
+											else
+											{
+												if (wsUserIP == wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1))
 												{
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
+													RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+														pFwRule, pFwRules, pNetFwPolicy2,
 														hrComInit, hr);
 
-													cIP ipTemp(sTemp2);
-													ipTemp++;
-													if(ipTemp.getAddress() != sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1))
-														sTemp2 = ipTemp.getAddress() + L"-" + sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1);
-													else
-														sTemp2 = ipTemp.getAddress();
+													cIP ipTemp(wsUserIP);
+													--ipTemp;
+													if (ipTemp.getAddress() != wsRuleIP.substr(0, foundRule))
+														wsUserIP = wsRuleIP.substr(0, foundRule) + L"-" + ipTemp.getAddress();
+													else{
+														wsUserIP = ipTemp.getAddress();
+													}
 													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-													cleanup(
-														bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules, pNetFwPolicy2,
-														hrComInit
-														);
-													return;
+													sDscr = L"Block " + wsUserIP;
+													makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+													makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
 												}
-												else if(sTemp2 ==  sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1))
+												else
+												{
+													RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+														pFwRule, pFwRules, pNetFwPolicy2,
+														hrComInit, hr);
+
+													cIP ipTemp(wsUserIP);
+													--ipTemp;
+													if (ipTemp.getAddress() != wsRuleIP.substr(0, foundRule))
+														wsUserIP = wsRuleIP.substr(0, foundRule) + L"-" + ipTemp.getAddress();
+													else
+														wsUserIP = ipTemp.getAddress();
+													sName = makeRuleName();
+													sDscr = L"Block " + wsUserIP;
+													makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+													makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+
+													++ipTemp; ++ipTemp;
+													if (ipTemp.getAddress() != wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1))
+														wsUserIP = ipTemp.getAddress() + L"-" + wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1);
+													else
 													{
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
-
-													cIP ipTemp(sTemp2);
-													ipTemp--;
-													if(ipTemp.getAddress() != sTemp1.substr(0, foundRule))
-														sTemp2 = sTemp1.substr(0, foundRule) + L"-" + ipTemp.getAddress();
-													else
-														sTemp2 = ipTemp.getAddress();
+														wsUserIP = ipTemp.getAddress();
+													}
 													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-													cleanup(
-														bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules, pNetFwPolicy2,
-														hrComInit
-														);
-													return;
-												}
-												else 
-												{
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
-
-													cIP ipTemp(sTemp2);
-													ipTemp--;
-													if(ipTemp.getAddress() != sTemp1.substr(0, foundRule))
-														sTemp2 = sTemp1.substr(0, foundRule) + L"-" + ipTemp.getAddress();
-													else
-														sTemp2 = ipTemp.getAddress();
-													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-
-													ipTemp++; ipTemp++;
-													if(ipTemp.getAddress() != sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1))
-														sTemp2 = ipTemp.getAddress() + L"-" + sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1);
-													else
-														sTemp2 = ipTemp.getAddress();
-													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-													cleanup(
-														bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules, pNetFwPolicy2,
-														hrComInit
-														);
-													return;
+													sDscr = L"Block " + wsUserIP;
+													makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+													makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
 												}
 											}
 										}
 									}
-									else
+								}
+								else// "-" found in userIP
+								{
+									if (foundRule == std::string::npos)
 									{
-										if(sTemp1 == sTemp2)
-											makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-												pFwRule, pFwRules,  pNetFwPolicy2,
-												hrComInit, hr);
-										else if(foundRule == std::string::npos)
+										wsRuleIP = wsRuleIP.substr(0, wsRuleIP.find('/'));
+										if (wsRuleIP >= wsUserIP.substr(0, foundIP) && wsRuleIP <= wsUserIP.substr(foundIP + 1, wsUserIP.length() - foundIP - 1))
+											RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+											pFwRule, pFwRules, pNetFwPolicy2,
+											hrComInit, hr);
+									}
+									else{
+										if (wsRuleIP.substr(0, foundRule) >= wsUserIP.substr(0, foundIP))
 										{
-											sTemp1 = sTemp1.substr(0, sTemp1.find('/'));
-											if(sTemp1 >= sTemp2.substr(0, foundIP) && sTemp1 <= sTemp2.substr(foundIP+1, sTemp2.length()-foundIP-1))
-												makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
-										}
-										else
-											if(sTemp1.substr(0, foundRule) >= sTemp2.substr(0, foundIP))
-												if(sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1) <= sTemp2.substr(foundIP+1, sTemp2.length()-foundIP-1))
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
+											if (wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1) <= wsUserIP.substr(foundIP + 1, wsUserIP.length() - foundIP - 1))
+												RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+												pFwRule, pFwRules, pNetFwPolicy2,
+												hrComInit, hr);
+
+											else
+											{
+												RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+													pFwRule, pFwRules, pNetFwPolicy2,
+													hrComInit, hr);
+												cIP ipTemp(wsUserIP.substr(foundIP + 1, wsUserIP.length() - foundIP - 1));
+												++ipTemp;
+												if (ipTemp.getAddress() != wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1))
+													wsUserIP = ipTemp.getAddress() + L"-" + wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1);
 												else
 												{
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
-													cIP ipTemp(sTemp2.substr(foundIP+1, sTemp2.length()-foundIP-1));
-													ipTemp++;
-													if(ipTemp.getAddress() != sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1))
-														sTemp2 = ipTemp.getAddress() + L"-" + sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1);
-													else
-														sTemp2 = ipTemp.getAddress();
-													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-													cleanup(
-														bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules, pNetFwPolicy2,
-														hrComInit
-														);
-													return;
+													wsUserIP = ipTemp.getAddress();
 												}
-											else if(sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1) <= sTemp2.substr(foundIP+1, sTemp2.length()-foundIP-1))
+												sName = makeRuleName();
+												sDscr = L"Block " + wsUserIP;
+												makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+												makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+											}
+										}
+										else
+										{
+											if (wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1) <= wsUserIP.substr(foundIP + 1, wsUserIP.length() - foundIP - 1))
+											{
+												RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+													pFwRule, pFwRules, pNetFwPolicy2,
+													hrComInit, hr);
+												cIP ipTemp(wsUserIP.substr(0, foundIP));
+												--ipTemp;
+												if (ipTemp.getAddress() != wsRuleIP.substr(0, foundRule))
+													wsUserIP = wsRuleIP.substr(0, foundRule) + L"-" + ipTemp.getAddress();
+												else
 												{
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
-													cIP ipTemp(sTemp2.substr(0, foundIP));
-													ipTemp--;
-													if(ipTemp.getAddress() != sTemp1.substr(0, foundRule))
-														sTemp2 = sTemp1.substr(0, foundRule) + L"-" + ipTemp.getAddress();
-													else
-														sTemp2 = ipTemp.getAddress();
-													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-													cleanup(
-														bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules, pNetFwPolicy2,
-														hrComInit
-														);
-													return;
+													wsUserIP = ipTemp.getAddress();
 												}
+												sName = makeRuleName();
+												sDscr = L"Block " + wsUserIP;
+												makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+												makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+											}
 											else
-												{
-													makeRuleHelper(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules,  pNetFwPolicy2,
-														hrComInit, hr);
-													std::wstring sTemp3 = sTemp2;
-													cIP ipTemp(sTemp2.substr(0, foundIP));
-													ipTemp--;
-													if(ipTemp.getAddress() != sTemp1.substr(0, foundRule))
-														sTemp2 = sTemp1.substr(0, foundRule) + L"-" + ipTemp.getAddress();
-													else
-														sTemp2 = ipTemp.getAddress();
-													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-
-													sTemp2 = sTemp3;
-													ipTemp = cIP(sTemp2.substr(foundIP+1, sTemp2.length()-foundIP-1));
-													ipTemp++;
-													if(ipTemp.getAddress() != sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1))
-														sTemp2 = ipTemp.getAddress() + L"-" + sTemp1.substr(foundRule+1, sTemp1.length()-foundRule-1);
-													else
-														sTemp2 = ipTemp.getAddress();
-													sName = makeRuleName();
-													sDscr = L"Block " + sTemp2;
-													makeRule(sName+std::wstring(L"out"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_OUT);
-													makeRule(sName+std::wstring(L"in"), sDscr, sTemp2, 1, NET_FW_RULE_DIR_IN);
-													cleanup(
-														bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
-														pFwRule, pFwRules, pNetFwPolicy2,
-														hrComInit
-														);
-													return;
+											{
+												RuleUnblocker(bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+													pFwRule, pFwRules, pNetFwPolicy2,
+													hrComInit, hr);
+												std::wstring sTemp3 = wsUserIP;
+												cIP ipTemp(wsUserIP.substr(0, foundIP));
+												--ipTemp;
+												if (ipTemp.getAddress() != wsRuleIP.substr(0, foundRule))
+													wsUserIP = wsRuleIP.substr(0, foundRule) + L"-" + ipTemp.getAddress();
+												else{
+													wsUserIP = ipTemp.getAddress();
 												}
+												sName = makeRuleName();
+												sDscr = L"Block " + wsUserIP;
+												makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+												makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+
+												wsUserIP = sTemp3;
+												ipTemp = cIP(wsUserIP.substr(foundIP + 1, wsUserIP.length() - foundIP - 1));
+												++ipTemp;
+												if (ipTemp.getAddress() != wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1))
+													wsUserIP = ipTemp.getAddress() + L"-" + wsRuleIP.substr(foundRule + 1, wsRuleIP.length() - foundRule - 1);
+												else
+												{
+													wsUserIP = ipTemp.getAddress();
+												}
+												sName = makeRuleName();
+												sDscr = L"Block " + wsUserIP;
+												makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
+												makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+											}
+										}
 									}
 								}
+							}
 					break;
 					}
 				}
@@ -567,7 +543,7 @@ void cFwAccess::cleanup(
 }
 
 // Method allows to avoid many repetitions in makeRule
-void cFwAccess::makeRuleHelper(
+void cFwAccess::RuleUnblocker(
 		BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, BSTR &bstrVal,
 		INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
 		HRESULT &hrComInit, HRESULT &hr)

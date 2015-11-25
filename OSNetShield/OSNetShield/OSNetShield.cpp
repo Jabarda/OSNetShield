@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include "Basic_window.h"
-//#include "cFwAccess.h"
 
 int __cdecl main()
 {
