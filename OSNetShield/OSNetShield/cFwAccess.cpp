@@ -352,6 +352,12 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 													sDscr = L"Block " + wsUserIP;
 													makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
 													makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+													cleanup(
+													bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+													pFwRule, pFwRules, pNetFwPolicy2,
+													hrComInit
+													);
+													return;
 												}
 											}
 										}
@@ -445,6 +451,12 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 												sDscr = L"Block " + wsUserIP;
 												makeRule(sName + std::wstring(L"out"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_OUT);
 												makeRule(sName + std::wstring(L"in"), sDscr, wsUserIP, 1, NET_FW_RULE_DIR_IN);
+												cleanup(
+												bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
+												pFwRule, pFwRules, pNetFwPolicy2,
+												hrComInit
+												);
+												return;
 											}
 										}
 									}
