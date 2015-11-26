@@ -14,13 +14,14 @@ void StartCountryDataWindow()
 {
 	CountryDataDialog CountryDataDialog;
 	CountryDataDialog.DoModal();
+	//CountryDataDialog.OnBnClickedButton1();
 	
 }
 
 CountryDataDialog::CountryDataDialog(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CountryDataDialog::IDD, pParent)
 {
-	DataBase.UpdateDB();
+	
 }
 
 CountryDataDialog::~CountryDataDialog()
@@ -47,15 +48,20 @@ END_MESSAGE_MAP()
 
 void CountryDataDialog::OnBnClickedButton1()
 {
+	DataBase.UpdateDB();
 	std::set<std::string> ComboList;
 	Combo.ResetContent();
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (ComboList.find(DataBase.Base[i].ShortName) == ComboList.end())
+		if (ComboList.find(DataBase.Base[i].LongName) == ComboList.end())
 		{
-			ComboList.insert(DataBase.Base[i].ShortName);
+			ComboList.insert(DataBase.Base[i].LongName);
+			//LPCTSTR buf = DataBase.Base[i].ShortName;
+			//std::cout << &buf << "\n";
+			//_getch();
 			//СДЕЛАТЬ НОРМАЛЬНЫЙ ВЫВОД
-			Combo.AddString((LPCTSTR)DataBase.Base[i].ShortName.c_str());
+			CString buf(DataBase.Base[i].LongName.c_str());
+			Combo.AddString(buf.GetString());
 		}
 	}
 	// TODO: добавьте свой код обработчика уведомлений
@@ -69,8 +75,9 @@ void CountryDataDialog::OnBnClickedButton2()
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
+		if (s.GetString == DataBase.Base[i].LongName) {};
 		//
-		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
+		// добавить проверку строки s с DataBase.Base[i].LongName, если верно то
 		// заблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
 	
@@ -83,6 +90,7 @@ void CountryDataDialog::OnBnClickedButton3()
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
+		if (s.GetString == DataBase.Base[i].LongName) {};
 		//
 		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
 		// РАЗблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to

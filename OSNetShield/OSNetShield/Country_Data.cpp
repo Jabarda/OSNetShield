@@ -15,6 +15,7 @@
 
 	std::string Country_Data::UpdateDB()
 	{	
+		
 		//std::cout << "Beginning DataBase updating\n";
 		std::fstream BaseFile("IPBase.data");
 		if (!BaseFile.is_open()) // если файл не открыт
@@ -63,15 +64,21 @@
 			//std::cout << "\n" << addr<<"\n";
 			//Base[CurrentBaseElement].to = (addr & 0xFF) + ((addr >> 8) & 0xFF) + ((addr >> 16) & 0xFF) + ((addr >> 24) & 0xFF);
 			i++;
+			//int num = 0;
+			
+			//Base[CurrentBaseElement].LongName = '\0';
+			//Base[CurrentBaseElement].ShortName.;
+			Base[CurrentBaseElement].ShortName = "";
 			while (Buf[i] != ',')
 			{
-				Base[CurrentBaseElement].ShortName += Buf[i];
+				Base[CurrentBaseElement].ShortName+= Buf[i];
 				i++;
 			}
 			i++;
+			Base[CurrentBaseElement].LongName = "";
 			while (Buf[i] != ';')
 			{
-				Base[CurrentBaseElement].LongName += Buf[i];
+				Base[CurrentBaseElement].LongName+=Buf[i];
 				i++;
 			}
 			i++; 
