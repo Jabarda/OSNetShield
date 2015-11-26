@@ -490,13 +490,16 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 		hr = pFwRules->Add(pFwRule);
 		if (FAILED(hr))
 		{
+			//CONSOLEOUTPUT 
+			/*
 			if(hr == E_ACCESSDENIED)
 				std::cout << "access denied\n";
 			if(hr == E_INVALIDARG)
 				std::cout << "invalid arg\n";
 			if(hr == E_UNEXPECTED)
 				std::cout << "unexpected\n";
-			printf("Firewall Rule Add failed: 0x%08lx\n", hr);
+				*/
+			//CONSOLEOUTPUT printf("Firewall Rule Add failed: 0x%08lx\n", hr);
 			cleanup(
 				bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
 				pFwRule, pFwRules, pNetFwPolicy2,
@@ -507,7 +510,7 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 		else
 		{
 			(this->vFwAddedRules).push_back(std::wstring (bstrRuleName, SysStringLen(bstrRuleName)));
-			std::cout << "IP successfully blocked.\n";
+			//CONSOLEOUTPUT std::cout << "IP successfully blocked.\n";
 		}
 	}
 	cleanup(
@@ -565,7 +568,7 @@ void cFwAccess::RuleUnblocker(
 		hr = pFwRules->Remove(bstrVal);
 		if (FAILED(hr))
 		{
-			printf("Firewall Rule Remove failed: 0x%08lx\n", hr);
+			//CONSOLEOUTPUT printf("Firewall Rule Remove failed: 0x%08lx\n", hr);
 			cleanup(
 				bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
 				pFwRule, pFwRules, pNetFwPolicy2,
@@ -575,7 +578,7 @@ void cFwAccess::RuleUnblocker(
 		}
 		else
 		{
-			std::cout << "IP successfully unblocked.\n";
+			//CONSOLEOUTPUT std::cout << "IP successfully unblocked.\n";
 			for( std::vector<std::wstring>::iterator iter = (this->vFwAddedRules).begin(); iter != (this->vFwAddedRules).end(); ++iter )
 			{
 				if( *iter == std::wstring (bstrVal, SysStringLen(bstrVal)) )
@@ -593,7 +596,7 @@ void cFwAccess::RuleUnblocker(
 		hr = pFwRules->Remove(SysAllocString(sTemp.c_str()));
 		if (FAILED(hr))
 		{
-			printf("Firewall Rule Remove failed: 0x%08lx\n", hr);
+			//CONSOLEOUTPUT printf("Firewall Rule Remove failed: 0x%08lx\n", hr);
 			cleanup(
 				bstrRuleName, bstrRuleDescription, bstrRuleGroup, bstrRuleRemoteAdresses, bstrVal,
 				pFwRule, pFwRules, pNetFwPolicy2,
@@ -603,7 +606,7 @@ void cFwAccess::RuleUnblocker(
 		}
 		else
 		{
-			std::cout << "IP successfully unblocked.\n";
+			//CONSOLEOUTPUT std::cout << "IP successfully unblocked.\n";
 			for( std::vector<std::wstring>::iterator iter = (this->vFwAddedRules).begin(); iter != (this->vFwAddedRules).end(); ++iter )
 			{
 				if( *iter == sTemp )
