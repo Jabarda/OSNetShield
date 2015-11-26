@@ -75,7 +75,8 @@ void CountryDataDialog::OnBnClickedButton2()
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s.GetString == DataBase.Base[i].LongName) {};
+		CString buf(DataBase.Base[i].LongName.c_str());
+		if (s.GetString() == buf.GetString()) {};
 		//
 		// добавить проверку строки s с DataBase.Base[i].LongName, если верно то
 		// заблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
@@ -90,7 +91,8 @@ void CountryDataDialog::OnBnClickedButton3()
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s.GetString == DataBase.Base[i].LongName) {};
+		CString buf(DataBase.Base[i].LongName.c_str());
+		if (s.GetString() == buf.GetString()) {};
 		//
 		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
 		// –ј«блокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
