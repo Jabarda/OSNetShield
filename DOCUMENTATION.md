@@ -12,6 +12,7 @@ Use this program at your own risk
 		- To display TCP connections click <b>Show active TCP connections</b><br>
 		- In TCP connection window click <b>UPDATE</b> to refresh the list of connections<br>
 		- To <b>CLOSE</b> the program tap <b>X</b><br>
+		- To block a country you need to manually download IPBase.data ( http://vk.com/away.php?utf=1&to=https%3A%2F%2Fyadi.sk%2Fd%2F96WhyTc2kjWM6 ) and put it into the folder with .exe file. Then you should tap <b>Blocking country</b> in the main window and then <b>Update Data</b> in the opened window. The data base will be loaded into the program so you can choose a country from the combo box to block or unblock.<br>
 	<br>
 	<b>Console</b>
 	<br>

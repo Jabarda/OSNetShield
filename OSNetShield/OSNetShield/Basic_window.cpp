@@ -7,6 +7,7 @@
 #include <iostream>
 #include "TCPForm.h"
 #include "thread"
+#include "CountryDataDialog.h"
 void thread_Proc(cFwAccess *pFwAccessIn)
 {
 	Basic_window window(pFwAccessIn);
@@ -40,6 +41,8 @@ BEGIN_MESSAGE_MAP(Basic_window, CDialog)
 	ON_EN_CHANGE(IDC_EDIT1, &Basic_window::OnEnChangeEdit1)
 	ON_EN_CHANGE(IDC_EDIT2, &Basic_window::OnEnChangeEdit2)
 	ON_BN_CLICKED(IDC_BUTTON1, &Basic_window::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &Basic_window::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &Basic_window::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -92,5 +95,21 @@ void Basic_window::OnBnClickedButton1()
 {
 	std::thread TCPwindow(thread_Proc2);
 	TCPwindow.detach();
+	// TODO: добавьте свой код обработчика уведомлений
+}
+
+
+void Basic_window::OnBnClickedButton2()
+{
+	std::thread CountryDataDialog(StartCountryDataWindow, pFwAccess);
+	CountryDataDialog.detach();
+	// TODO: добавьте свой код обработчика уведомлений
+}
+
+
+void Basic_window::OnBnClickedButton3()
+{	
+	CDialog::OnOK();
+
 	// TODO: добавьте свой код обработчика уведомлений
 }
