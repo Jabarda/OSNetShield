@@ -11,6 +11,13 @@
 	Country_Data::Country_Data()
 	{
 		Base.reserve(200000);
+		//for(int i = 0; i < 200000; i++)
+		//{
+		//	Base[i].ShortName = "";
+		//	Base[i].LongName = "";
+		//	Base[i].from = in_addr();
+		//	Base[i].to = ;
+		//}
 	}
 
 	std::string Country_Data::UpdateDB()

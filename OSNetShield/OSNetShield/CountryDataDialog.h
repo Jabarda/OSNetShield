@@ -6,6 +6,8 @@
 
 // диалоговое окно CountryDataDialog
 void StartCountryDataWindow(cFwAccess *pFwAccessIn);
+std::wstring intToIP(int compressedIp);
+
 class CountryDataDialog : public CDialogEx
 {
 	DECLARE_DYNAMIC(CountryDataDialog)

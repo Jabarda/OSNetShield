@@ -18,6 +18,16 @@ void StartCountryDataWindow(cFwAccess *pFwAccessIn)
 	
 }
 
+std::wstring intToIP(int compressedIp)
+{
+	unsigned char bytes[4];
+    bytes[0] = compressedIp & 0xFF;
+    bytes[1] = (compressedIp >> 8) & 0xFF;
+    bytes[2] = (compressedIp >> 16) & 0xFF;
+    bytes[3] = (compressedIp >> 24) & 0xFF;	
+	return std::to_wstring(bytes[3]) + std::wstring(L".") + std::to_wstring(bytes[2]) + std::wstring(L".") + std::to_wstring(bytes[1]) + std::wstring(L".") + std::to_wstring(bytes[0]);
+}
+
 CountryDataDialog::CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CountryDataDialog::IDD, pParent)
 {
@@ -77,10 +87,10 @@ void CountryDataDialog::OnBnClickedButton2()
 	for (int i = 0; i < DataBase.amount; i++)
 	{
 		if (s == DataBase.Base[i].LongName.c_str()) 
-		//CString buf(DataBase.Base[i].LongName.c_str());
-		//if(s.GetString() == buf.GetString())
 		{
-			wsIPRange = std::wstring(inet_ntoa(DataBase.Base[i].from), inet_ntoa(DataBase.Base[i].from)+strlen(inet_ntoa(DataBase.Base[i].from)));
+			wsIPRange = intToIP(DataBase.Base[i].from.S_un.S_addr) +
+				L"-" +
+				intToIP(DataBase.Base[i].to.S_un.S_addr);
 			pFwAccess->controlFwGUI(wsIPRange, 1);
 		}
 		//
@@ -98,11 +108,11 @@ void CountryDataDialog::OnBnClickedButton3()
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s == DataBase.Base[i].LongName.c_str()) 
-		//CString buf(DataBase.Base[i].LongName.c_str());
-		//if(s.GetString() == buf.GetString())
+		if (s == DataBase.Base[i].LongName.c_str())
 		{
-			wsIPRange = std::wstring(inet_ntoa(DataBase.Base[i].from), inet_ntoa(DataBase.Base[i].from)+strlen(inet_ntoa(DataBase.Base[i].from)));
+			wsIPRange = intToIP(DataBase.Base[i].from.S_un.S_addr) +
+				L"-" +
+				intToIP(DataBase.Base[i].to.S_un.S_addr);
 			pFwAccess->controlFwGUI(wsIPRange, 2);
 		}
 		//
