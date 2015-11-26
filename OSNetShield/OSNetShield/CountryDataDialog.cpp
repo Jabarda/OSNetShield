@@ -10,18 +10,18 @@
 
 IMPLEMENT_DYNAMIC(CountryDataDialog, CDialogEx)
 
-void StartCountryDataWindow()
+void StartCountryDataWindow(cFwAccess *pFwAccessIn)
 {
-	CountryDataDialog CountryDataDialog;
+	CountryDataDialog CountryDataDialog(pFwAccessIn);
 	CountryDataDialog.DoModal();
 	//CountryDataDialog.OnBnClickedButton1();
 	
 }
 
-CountryDataDialog::CountryDataDialog(CWnd* pParent /*=NULL*/)
+CountryDataDialog::CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CountryDataDialog::IDD, pParent)
 {
-	
+	pFwAccess = pFwAccessIn;
 }
 
 CountryDataDialog::~CountryDataDialog()
@@ -72,10 +72,17 @@ void CountryDataDialog::OnBnClickedButton2()
 {
 	
 	CString s;
+	std::wstring wsIPRange;
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s.GetString == DataBase.Base[i].LongName) {};
+		if (s == DataBase.Base[i].LongName.c_str()) 
+		//CString buf(DataBase.Base[i].LongName.c_str());
+		//if(s.GetString() == buf.GetString())
+		{
+			wsIPRange = std::wstring(inet_ntoa(DataBase.Base[i].from), inet_ntoa(DataBase.Base[i].from)+strlen(inet_ntoa(DataBase.Base[i].from)));
+			pFwAccess->controlFwGUI(wsIPRange, 1);
+		}
 		//
 		// добавить проверку строки s с DataBase.Base[i].LongName, если верно то
 		// заблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
@@ -87,10 +94,17 @@ void CountryDataDialog::OnBnClickedButton2()
 void CountryDataDialog::OnBnClickedButton3()
 {
 	CString s;
+	std::wstring wsIPRange;
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s.GetString == DataBase.Base[i].LongName) {};
+		if (s == DataBase.Base[i].LongName.c_str()) 
+		//CString buf(DataBase.Base[i].LongName.c_str());
+		//if(s.GetString() == buf.GetString())
+		{
+			wsIPRange = std::wstring(inet_ntoa(DataBase.Base[i].from), inet_ntoa(DataBase.Base[i].from)+strlen(inet_ntoa(DataBase.Base[i].from)));
+			pFwAccess->controlFwGUI(wsIPRange, 2);
+		}
 		//
 		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
 		// –ј«блокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
