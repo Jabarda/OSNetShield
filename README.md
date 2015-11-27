@@ -12,4 +12,4 @@ Goal: Write a program capable of accomplishing certain objectives.</br></br>
 Objectives: </br>
 *Blocking a specified ip</br>
 *Blocking a specified group of ip's</br>
-*Defence against unwanted and harmful connections</br>
+*Using a data base to block IPs</br>
