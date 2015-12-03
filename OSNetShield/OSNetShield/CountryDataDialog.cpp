@@ -14,7 +14,6 @@ void StartCountryDataWindow(cFwAccess *pFwAccessIn)
 {
 	CountryDataDialog CountryDataDialog(pFwAccessIn);
 	CountryDataDialog.DoModal();
-	//CountryDataDialog.OnBnClickedButton1();
 	
 }
 
@@ -66,15 +65,10 @@ void CountryDataDialog::OnBnClickedButton1()
 		if (ComboList.find(DataBase.Base[i].LongName) == ComboList.end())
 		{
 			ComboList.insert(DataBase.Base[i].LongName);
-			//LPCTSTR buf = DataBase.Base[i].ShortName;
-			//std::cout << &buf << "\n";
-			//_getch();
-			//СДЕЛАТЬ НОРМАЛЬНЫЙ ВЫВОД
 			CString buf(DataBase.Base[i].LongName.c_str());
 			Combo.AddString(buf.GetString());
 		}
 	}
-	// TODO: добавьте свой код обработчика уведомлений
 }
 
 
@@ -93,9 +87,6 @@ void CountryDataDialog::OnBnClickedButton2()
 				intToIP(DataBase.Base[i].to.S_un.S_addr);
 			pFwAccess->controlFwGUI(wsIPRange, 1);
 		}
-		//
-		// добавить проверку строки s с DataBase.Base[i].LongName, если верно то
-		// заблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
 	
 }
@@ -115,14 +106,10 @@ void CountryDataDialog::OnBnClickedButton3()
 				intToIP(DataBase.Base[i].to.S_un.S_addr);
 			pFwAccess->controlFwGUI(wsIPRange, 2);
 		}
-		//
-		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
-		// РАЗблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
 }
 
 
 void CountryDataDialog::OnCbnSelchangeCombo1()
 {
-	// TODO: добавьте свой код обработчика уведомлений
 }

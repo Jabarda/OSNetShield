@@ -4,7 +4,7 @@
 #include "Country_Data.h"
 #include "cFwAccess.h"
 
-// диалоговое окно CountryDataDialog
+// dialog window CountryDataDialog
 void StartCountryDataWindow(cFwAccess *pFwAccessIn);
 std::wstring intToIP(int compressedIp);
 
@@ -14,14 +14,14 @@ class CountryDataDialog : public CDialogEx
 
 public:
 	Country_Data DataBase;
-	CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent = NULL);   // стандартный конструктор
+	CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent = NULL);   // standart constructor
 	virtual ~CountryDataDialog();
 
-// Данные диалогового окна
+// Dialog window data
 	enum { IDD = IDD_DIALOG3 };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // поддержка DDX/DDV
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 private:

@@ -5,7 +5,6 @@ class Country_Data
 public:
 	Country_Data();
 	~Country_Data();
-	//struct Value;
 	struct Value
 	{
 		std::string ShortName, LongName;

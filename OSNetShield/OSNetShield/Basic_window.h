@@ -2,7 +2,7 @@
 #include "resource.h"
 #include "cFwAccess.h"
 
-// диалоговое окно Basic_window
+// dialog window Basic_window
 
 void thread_Proc(cFwAccess *pFwAccessIn);
 
@@ -11,14 +11,14 @@ class Basic_window : public CDialog
 	DECLARE_DYNAMIC(Basic_window)
 
 public:
-	Basic_window(cFwAccess *pFwAccessIn, CWnd* pParent = NULL);   // стандартный конструктор
+	Basic_window(cFwAccess *pFwAccessIn, CWnd* pParent = NULL);   // standart constructor
 	virtual ~Basic_window();
 	
-// Данные диалогового окна
+// dialog window data
 	enum { IDD = IDD_DIALOG1 };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // поддержка DDX/DDV
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 
