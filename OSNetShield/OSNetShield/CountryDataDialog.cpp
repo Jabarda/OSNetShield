@@ -10,17 +10,29 @@
 
 IMPLEMENT_DYNAMIC(CountryDataDialog, CDialogEx)
 
-void StartCountryDataWindow()
+void StartCountryDataWindow(cFwAccess *pFwAccessIn)
 {
-	CountryDataDialog CountryDataDialog;
-	CountryDataDialog.DoModal();
-	//CountryDataDialog.OnBnClickedButton1();
+	CountryDataDialog CountryDialog(pFwAccessIn);
+	CountryDialog.DoModal();
+	
+	
 	
 }
 
-CountryDataDialog::CountryDataDialog(CWnd* pParent /*=NULL*/)
+std::wstring intToIP(int compressedIp)
+{
+	unsigned char bytes[4];
+    bytes[0] = compressedIp & 0xFF;
+    bytes[1] = (compressedIp >> 8) & 0xFF;
+    bytes[2] = (compressedIp >> 16) & 0xFF;
+    bytes[3] = (compressedIp >> 24) & 0xFF;	
+	return std::to_wstring(bytes[3]) + std::wstring(L".") + std::to_wstring(bytes[2]) + std::wstring(L".") + std::to_wstring(bytes[1]) + std::wstring(L".") + std::to_wstring(bytes[0]);
+}
+
+CountryDataDialog::CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CountryDataDialog::IDD, pParent)
 {
+	pFwAccess = pFwAccessIn;
 	
 }
 
@@ -42,13 +54,14 @@ BEGIN_MESSAGE_MAP(CountryDataDialog, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CountryDataDialog::OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
 
-
 // обработчики сообщений CountryDataDialog
 
 
 void CountryDataDialog::OnBnClickedButton1()
 {
-	DataBase.UpdateDB();
+	CString s;
+	GetDlgItem(IDC_EDIT1)->GetWindowText(s);
+	DataBase.UpdateDB(s);
 	std::set<std::string> ComboList;
 	Combo.ResetContent();
 	for (int i = 0; i < DataBase.amount; i++)
@@ -72,12 +85,20 @@ void CountryDataDialog::OnBnClickedButton2()
 {
 	
 	CString s;
+	std::wstring wsIPRange;
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s == DataBase.Base[i].LongName.c_str()) {
-			//TODO
-		};
+		if (s == DataBase.Base[i].LongName.c_str()) 
+		{
+			wsIPRange = intToIP(DataBase.Base[i].from.S_un.S_addr) +
+				L"-" +
+				intToIP(DataBase.Base[i].to.S_un.S_addr);
+			pFwAccess->controlFwGUI(wsIPRange, 1);
+		}
+		//
+		// добавить проверку строки s с DataBase.Base[i].LongName, если верно то
+		// заблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
 	
 }
@@ -86,12 +107,20 @@ void CountryDataDialog::OnBnClickedButton2()
 void CountryDataDialog::OnBnClickedButton3()
 {
 	CString s;
+	std::wstring wsIPRange;
 	Combo.GetWindowTextW(s);
 	for (int i = 0; i < DataBase.amount; i++)
 	{
-		if (s == DataBase.Base[i].LongName.c_str()) {
-			//TODO
-		};
+		if (s == DataBase.Base[i].LongName.c_str())
+		{
+			wsIPRange = intToIP(DataBase.Base[i].from.S_un.S_addr) +
+				L"-" +
+				intToIP(DataBase.Base[i].to.S_un.S_addr);
+			pFwAccess->controlFwGUI(wsIPRange, 2);
+		}
+		//
+		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
+		// –ј«блокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
 }
 

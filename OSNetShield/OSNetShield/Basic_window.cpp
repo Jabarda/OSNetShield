@@ -101,7 +101,7 @@ void Basic_window::OnBnClickedButton1()
 
 void Basic_window::OnBnClickedButton2()
 {
-	std::thread CountryDataDialog(StartCountryDataWindow);
+	std::thread CountryDataDialog(StartCountryDataWindow, pFwAccess);
 	CountryDataDialog.detach();
 	// TODO: добавьте свой код обработчика уведомлений
 }
