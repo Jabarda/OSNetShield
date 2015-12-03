@@ -12,7 +12,7 @@ public:
 	};
 
 	std::vector<Value> Base;
-	std::string UpdateDB();
+	std::string UpdateDB(CString s);
 	int amount;//data size
 	void print();
 };
