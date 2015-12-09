@@ -8,13 +8,14 @@
 #include "TCPForm.h"
 #include "thread"
 #include "CountryDataDialog.h"
+
+
 void thread_Proc(cFwAccess *pFwAccessIn)
 {
 	Basic_window window(pFwAccessIn);
 	window.DoModal();
 }
 
-// диалоговое окно Basic_window
 
 IMPLEMENT_DYNAMIC(Basic_window, CDialogEx)
 
@@ -38,78 +39,137 @@ void Basic_window::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(Basic_window, CDialog)
 	ON_BN_CLICKED(IDBlock, &Basic_window::OnBnClickedBlock)
 	ON_BN_CLICKED(IDUnblock, &Basic_window::OnBnClickedUnblock)
-	ON_EN_CHANGE(IDC_EDIT1, &Basic_window::OnEnChangeEdit1)
-	ON_EN_CHANGE(IDC_EDIT2, &Basic_window::OnEnChangeEdit2)
-	ON_BN_CLICKED(IDC_BUTTON1, &Basic_window::OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON2, &Basic_window::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &Basic_window::OnBnClickedButton3)
+	ON_BN_CLICKED(ID_TCP_BUTTON, &Basic_window::OnBnClickedTCP)
+	ON_BN_CLICKED(ID_DATABASE_BUTTON, &Basic_window::OnBnClickedBase)
+	ON_BN_CLICKED(ID_EXIT, &Basic_window::OnBnClickedExit)
 END_MESSAGE_MAP()
 
 
-// обработчики сообщений Basic_window
+// Event handlers
 
-
+// If input is correct blocks it
 void Basic_window::OnBnClickedBlock()
 {
 	CString s;
 	GetDlgItem(IDC_EDIT1)->GetWindowText(s);
-	// TODO: добавьте свой код обработчика уведомлений
-	if(s.GetLength() != 0)
-		pFwAccess->controlFwGUI(std::wstring(s), 1);
+
+	int msgboxID;
+
+	if(pFwAccess->isWstringIP(std::wstring(s)))
+		{
+			if(s.GetLength() != 0)
+				pFwAccess->controlFwGUI(std::wstring(s), 1);
+
+			s = "Blocked " + s;
+			msgboxID = MessageBox(
+				(LPCTSTR)s,
+				(LPCTSTR)L"Block",
+				MB_OK
+			);
+		}
+	else
+		{
+			std::size_t found = std::wstring(s).find('-');
+			if(found!=std::string::npos)
+				if(pFwAccess->isWstringIP(std::wstring(s).substr(0, found)) && pFwAccess->isWstringIP(std::wstring(s).substr(found+1, std::wstring(s).length()-found-1)))
+				{
+					if(s.GetLength() != 0)
+						pFwAccess->controlFwGUI(std::wstring(s), 1);
+
+						s = "Blocked " + s;
+						msgboxID = MessageBox(
+							(LPCTSTR)s,
+							(LPCTSTR)L"Block",
+							MB_OK
+						);
+				}
+				else
+					msgboxID = MessageBox(
+						(LPCTSTR)L"Inappropriate input",
+						(LPCTSTR)L"Error",
+						MB_ICONERROR | MB_OK
+					);
+			else
+				msgboxID = MessageBox(
+						(LPCTSTR)L"Inappropriate input",
+						(LPCTSTR)L"Error",
+						MB_ICONERROR | MB_OK
+					);
+		}
 }
 
-
+// If input is correct unblocks it
 void Basic_window::OnBnClickedUnblock()
 {
 	CString s;
 	GetDlgItem(IDC_EDIT1)->GetWindowText(s);
-	// TODO: добавьте свой код обработчика уведомлений
 
-	pFwAccess->controlFwGUI(std::wstring(s), 2);
+	int msgboxID;
+
+	if(pFwAccess->isWstringIP(std::wstring(s)))
+		{
+			if(s.GetLength() != 0)
+				pFwAccess->controlFwGUI(std::wstring(s), 2);
+
+			s = "Unblocked " + s;
+			int msgboxID = MessageBox(
+				(LPCTSTR)s,
+				(LPCTSTR)L"Unblock",
+				MB_OK
+			);
+		}
+	else
+		{
+			std::size_t found = std::wstring(s).find('-');
+			if(found!=std::string::npos)
+				if(pFwAccess->isWstringIP(std::wstring(s).substr(0, found)) && pFwAccess->isWstringIP(std::wstring(s).substr(found+1, std::wstring(s).length()-found-1)))
+				{
+					if(s.GetLength() != 0)
+						pFwAccess->controlFwGUI(std::wstring(s), 2);
+
+						s = "Unblocked " + s;
+						int msgboxID = MessageBox(
+							(LPCTSTR)s,
+							(LPCTSTR)L"Unblock",
+							MB_OK
+						);
+				}
+				else
+					msgboxID = MessageBox(
+						(LPCTSTR)L"Inappropriate input",
+						(LPCTSTR)L"Error",
+						MB_ICONERROR | MB_OK
+					);
+			else
+				msgboxID = MessageBox(
+						(LPCTSTR)L"Inappropriate input",
+						(LPCTSTR)L"Error",
+						MB_ICONERROR | MB_OK
+					);
+		}
 }
 
-
-void Basic_window::OnEnChangeEdit1()
-{
-	// TODO:  Если это элемент управления RICHEDIT, то элемент управления не будет
-	// send this notification unless you override the CDialog::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-
-	// TODO:  Добавьте код элемента управления
-}
-
-
-void Basic_window::OnEnChangeEdit2()
-{
-	// TODO:  Если это элемент управления RICHEDIT, то элемент управления не будет
-	// send this notification unless you override the CDialog::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-
-	// TODO:  Добавьте код элемента управления
-}
-
-
-void Basic_window::OnBnClickedButton1()
+// Open the window with TCP connections
+void Basic_window::OnBnClickedTCP()
 {
 	std::thread TCPwindow(thread_Proc2);
 	TCPwindow.detach();
 	// TODO: добавьте свой код обработчика уведомлений
 }
 
-
-void Basic_window::OnBnClickedButton2()
+// Open the window that allows blocking a database
+void Basic_window::OnBnClickedBase()
 {
 	std::thread CountryDataDialog(StartCountryDataWindow, pFwAccess);
 	CountryDataDialog.detach();
 	// TODO: добавьте свой код обработчика уведомлений
 }
 
-
-void Basic_window::OnBnClickedButton3()
+// Guess what
+void Basic_window::OnBnClickedExit()
 {	
 	CDialog::OnOK();
+	exit(0);
 
 	// TODO: добавьте свой код обработчика уведомлений
 }

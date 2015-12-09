@@ -5,7 +5,6 @@ class Country_Data
 public:
 	Country_Data();
 	~Country_Data();
-	//struct Value;
 	struct Value
 	{
 		std::string ShortName, LongName;
@@ -13,7 +12,7 @@ public:
 	};
 
 	std::vector<Value> Base;
-	std::string UpdateDB();
+	std::string UpdateDB(CString s);
 	int amount;//data size
 	void print();
 };

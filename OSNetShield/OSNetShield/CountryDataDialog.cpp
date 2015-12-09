@@ -12,9 +12,10 @@ IMPLEMENT_DYNAMIC(CountryDataDialog, CDialogEx)
 
 void StartCountryDataWindow(cFwAccess *pFwAccessIn)
 {
-	CountryDataDialog CountryDataDialog(pFwAccessIn);
-	CountryDataDialog.DoModal();
-	//CountryDataDialog.OnBnClickedButton1();
+	CountryDataDialog CountryDialog(pFwAccessIn);
+	CountryDialog.DoModal();
+	
+	
 	
 }
 
@@ -32,6 +33,7 @@ CountryDataDialog::CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent /*=NU
 	: CDialogEx(CountryDataDialog::IDD, pParent)
 {
 	pFwAccess = pFwAccessIn;
+	
 }
 
 CountryDataDialog::~CountryDataDialog()
@@ -52,13 +54,14 @@ BEGIN_MESSAGE_MAP(CountryDataDialog, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CountryDataDialog::OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
 
-
 // обработчики сообщений CountryDataDialog
 
 
 void CountryDataDialog::OnBnClickedButton1()
 {
-	DataBase.UpdateDB();
+	CString s;
+	GetDlgItem(IDC_EDIT1)->GetWindowText(s);
+	DataBase.UpdateDB(s);
 	std::set<std::string> ComboList;
 	Combo.ResetContent();
 	for (int i = 0; i < DataBase.amount; i++)

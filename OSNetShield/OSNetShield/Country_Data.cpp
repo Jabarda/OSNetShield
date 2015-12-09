@@ -20,11 +20,11 @@
 		//}
 	}
 
-	std::string Country_Data::UpdateDB()
+	std::string Country_Data::UpdateDB(CString s)
 	{	
 		
 		//std::cout << "Beginning DataBase updating\n";
-		std::fstream BaseFile("IPBase.data");
+		std::fstream BaseFile(s);
 		if (!BaseFile.is_open()) // если файл не открыт
 			return "Файл не может быть открыт!\n"; // сообщить об этом
 		int CurrentBaseElement = 0;//start parsing

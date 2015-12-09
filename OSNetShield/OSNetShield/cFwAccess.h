@@ -8,11 +8,12 @@
 #pragma comment( lib, "ole32.lib" )
 #pragma comment( lib, "oleaut32.lib" )
 
-std::string makeRuleName(std::vector<std::wstring> &vFwAddedRules);
-
+/// Initialize INetFwPolicy2 object
+/// Taken from the example
 HRESULT WFCOMInitialize(INetFwPolicy2** ppNetFwPolicy2);
 
-// Class to ease the work with IPs
+/// Class to ease the work with IPs
+/// Allows to move to the previous or next IP easily
 class cIP
 {
 public:
@@ -26,7 +27,9 @@ private:
 	std::wstring sAddr;
 };
 
-// Class to manipulate Windows Firewall
+///
+/// Class to manipulate Windows Firewall
+/// 
 class cFwAccess
 {
 public:
@@ -46,6 +49,7 @@ public:
 	void controlFwGUI(std::wstring &sIP, int nAction);
 	bool isWstringIP(std::wstring &str);
 private:
+	// Vector contains the names of the previously added rules
 	std::vector<std::wstring> vFwAddedRules;
 };
 
