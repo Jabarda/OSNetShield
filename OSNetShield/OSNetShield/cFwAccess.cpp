@@ -124,7 +124,10 @@ void cIP::operator --()
 cFwAccess::cFwAccess(void)
 {
 	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
+	
+	std::cout << "Blocked IP's:\n";
 	makeRule(sName, sDescription, sAddr, 0, NET_FW_RULE_DIR_OUT);
+	std::cout << std::endl;
 }
 
 cFwAccess::~cFwAccess(void)
@@ -269,13 +272,15 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 				{
 					if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
 					if (std::wstring(bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
-					if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal)))
 					switch(nAction)
 					{
-					case 0:// Add rule name to the vector if it belongs to apps 
+					case 0:// Add rule name to the vector if it belongs to app and print it into the console
+						if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
 							(this->vFwAddedRules).push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
-						break;
+							//std::wcout << std::wstring (bstrVal, SysStringLen(bstrVal)) << L"\n";
+							break;
 					case 2:// Remove rule if it belongs to apps group and blocks specified IP
+					if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal))){
 							wsRuleIP = std::wstring(bstrVal, SysStringLen(bstrVal));
 							wsUserIP = std::wstring(bstrRuleRemoteAdresses, SysStringLen(bstrRuleRemoteAdresses));
 
@@ -470,7 +475,8 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 									}
 								}
 							}
-					break;
+					}
+							break;
 					}
 				}
 			}
@@ -658,6 +664,10 @@ std::wstring cFwAccess::makeRuleName()
 ///
 void cFwAccess::controlFw()
 {
+	std::cout << vFwAddedRules.size() << std::endl;;
+	for(int i = 0; i < vFwAddedRules.size(); i++)
+		std::wcout << vFwAddedRules[i] << L"\n";
+
 	int menuAction = 0;
 	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
 
