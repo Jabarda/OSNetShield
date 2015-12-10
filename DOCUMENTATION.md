@@ -13,3 +13,5 @@ You can use a database with countries IPs that is provided with the program. You
 Use this program at your own risk</br>
 
 [Read wiki](https://github.com/Vukiz/OSNetShield/wiki)<br> for manuals and more detailed description.
+[read developers Wiki]
+(https://https://goo.gl/WI8gBp)<br>
