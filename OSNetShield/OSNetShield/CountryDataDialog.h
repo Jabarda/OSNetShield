@@ -12,6 +12,8 @@ class CountryDataDialog : public CDialogEx
 {
 	DECLARE_DYNAMIC(CountryDataDialog)
 
+	virtual BOOL OnInitDialog( );
+
 public:
 	Country_Data DataBase;
 	CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent = NULL);   // standart constructor

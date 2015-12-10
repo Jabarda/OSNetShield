@@ -61,6 +61,9 @@ std::wstring cIP::getAddress()
 	return sAddr;
 }
 
+///
+/// The next IP
+///
 void cIP::operator ++()
 {
 	if(nOctet[3] != 255)
@@ -87,6 +90,9 @@ void cIP::operator ++()
 	sAddr = std::to_wstring(nOctet[0]) + std::wstring(L".") + std::to_wstring(nOctet[1]) + std::wstring(L".") + std::to_wstring(nOctet[2]) + std::wstring(L".") + std::to_wstring(nOctet[3]);
 }
 
+///
+/// The previous IP
+///
 void cIP::operator --()
 {
 	if(nOctet[3] != 0)
@@ -118,15 +124,20 @@ void cIP::operator --()
 cFwAccess::cFwAccess(void)
 {
 	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
+	
+	std::cout << "Blocked IP's:\n";
 	makeRule(sName, sDescription, sAddr, 0, NET_FW_RULE_DIR_OUT);
+	std::cout << std::endl;
 }
 
 cFwAccess::~cFwAccess(void)
 {
 }
 
-// Adding (nAction = 1), removing rules (nAction = 2)
-// Filling vFwAddedRules with previously added rules (nAction = 0) (used for proper naming)
+///
+/// Adding (nAction = 1) and removing rules (nAction = 2)
+/// Filling vFwAddedRules with previously added rules (nAction = 0) (used for proper naming)
+///
 void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring &sAddr, int nAction, NET_FW_RULE_DIRECTION_ dir)
 {
 	std::size_t foundRule, foundIP;
@@ -261,13 +272,19 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 				{
 					if (SUCCEEDED(pFwRule->get_Grouping(&bstrVal)))
 					if (std::wstring(bstrVal, SysStringLen(bstrVal)) == SysAllocString(L"OSNetShield"))
-					if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal)))
 					switch(nAction)
 					{
-					case 0:// Add rule name to the vector if it belongs to apps 
+					case 0:// Add rule name to the vector if it belongs to app and print it into the console
+						if (SUCCEEDED(pFwRule->get_Name(&bstrVal)))
+						{
 							(this->vFwAddedRules).push_back(std::wstring (bstrVal, SysStringLen(bstrVal)));
-						break;
+							std::wcout << std::wstring (bstrVal, SysStringLen(bstrVal)) << L" ";
+							pFwRule->get_RemoteAddresses(&bstrVal);
+							std::wcout << std::wstring (bstrVal, SysStringLen(bstrVal)) << L"\n";
+						}
+							break;
 					case 2:// Remove rule if it belongs to apps group and blocks specified IP
+					if (SUCCEEDED(pFwRule->get_RemoteAddresses(&bstrVal))){
 							wsRuleIP = std::wstring(bstrVal, SysStringLen(bstrVal));
 							wsUserIP = std::wstring(bstrRuleRemoteAdresses, SysStringLen(bstrRuleRemoteAdresses));
 
@@ -462,7 +479,8 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 									}
 								}
 							}
-					break;
+					}
+							break;
 					}
 				}
 			}
@@ -520,6 +538,7 @@ void cFwAccess::makeRule(std::wstring &sName, std::wstring &sDscr, std::wstring 
 		);
 }
 
+// Free memory
 void cFwAccess::cleanup(
 	BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses,  BSTR &bstrVal, 
 	INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
@@ -557,7 +576,10 @@ void cFwAccess::cleanup(
     }
 }
 
-// Method allows to avoid many repetitions in makeRule
+///
+/// Method allows to avoid many repetitions in makeRule method
+/// In general, it removes a single rule (for both inbound and outbound connection)
+///
 void cFwAccess::RuleUnblocker(
 		BSTR &bstrRuleName, BSTR &bstrRuleDescription, BSTR &bstrRuleGroup, BSTR &bstrRuleRemoteAdresses, BSTR &bstrVal,
 		INetFwRule *pFwRule, INetFwRules *pFwRules,  INetFwPolicy2 *pNetFwPolicy2,
@@ -619,8 +641,13 @@ void cFwAccess::RuleUnblocker(
 	}
 }
 
-// Naming the rule, based on the number of previously added rules
-// New name has to be unique
+///
+/// The method creates a name for a new rule
+/// Although it's possible to create rules with same names, the names must differ for proper rule deleting
+/// The naming is based on wstrings in vFwAddedRules from cFwAccess class, which contains the names of the previously added rules
+/// The name of the new rule looks like "OSNetShield" + the smallest available number
+///std::string makeRuleName(std::vector<std::wstring> &vFwAddedRules);
+///
 std::wstring cFwAccess::makeRuleName()
 {
 	std::wstring sName, sNameTemp;
@@ -636,7 +663,9 @@ std::wstring cFwAccess::makeRuleName()
 	return sName;
 }
 
-// Manipulate the rules using console
+///
+/// Manipulate the program using console
+///
 void cFwAccess::controlFw()
 {
 	int menuAction = 0;
@@ -712,7 +741,9 @@ void cFwAccess::controlFw()
 	}
 }
 
-// Manipulate the rules using GUI
+///
+/// Manipulate the program using GUI
+///
 void cFwAccess::controlFwGUI(std::wstring &sIP, int nAction)
 {
 	std::wstring sName = std::wstring(L"Name"), sDescription = std::wstring(L"Block "), sAddr = std::wstring(L"0.0.0.0");
@@ -771,7 +802,9 @@ void cFwAccess::controlFwGUI(std::wstring &sIP, int nAction)
 	}
 }
 
-// Determine if the wstring can be interpreted as an IP
+///
+/// Determine if the wstring can be interpreted as an IP address
+///
 bool cFwAccess::isWstringIP(std::wstring &str)
 {
 	int nTemp = 0, nCount = 0;

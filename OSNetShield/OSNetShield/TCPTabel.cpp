@@ -9,7 +9,9 @@
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 /* Note: could also use malloc() and free() */
 
-
+///
+/// Fills the table in the TCP window with active TCP connections
+///
 int Get_Info(CWnd* pWnd, CWnd* waitLabel)
 {
 	setlocale(LC_ALL, "");

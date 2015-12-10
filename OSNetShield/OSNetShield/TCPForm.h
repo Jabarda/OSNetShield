@@ -1,9 +1,11 @@
 #pragma once
 #include "resource.h"
 
-
-// dialog window TCPForm
+///
+/// The method puts the TCP connections window in its own thread
+///
 void thread_Proc2();
+
 class TCPForm : public CDialog
 {
 	DECLARE_DYNAMIC(TCPForm)
@@ -22,5 +24,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedUpdate();
 };
