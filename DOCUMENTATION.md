@@ -12,6 +12,5 @@ Active TCP connections can be updated at any time with the Update button.</br>
 You can use a database with countries IPs that is provided with the program. You only need to click the Load database button and choose a country to block in the combo box. To use your own database you need to put it into the folder with the program, input its name into the text field and click Load database. You can find the information on the database format in the wiki.</br></br>
 Use this program at your own risk</br>
 
-[Read wiki](https://github.com/Vukiz/OSNetShield/wiki)<br> for manuals and more detailed description.
-[read developers Wiki]
-(https://https://goo.gl/WI8gBp)<br>
+[Read wiki](https://github.com/Vukiz/OSNetShield/wiki) for manuals and more detailed description.<br>
+[read developers Wiki](https://goo.gl/WI8gBp)<br>
