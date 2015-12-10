@@ -29,11 +29,18 @@ std::wstring intToIP(int compressedIp)
 	return std::to_wstring(bytes[3]) + std::wstring(L".") + std::to_wstring(bytes[2]) + std::wstring(L".") + std::to_wstring(bytes[1]) + std::wstring(L".") + std::to_wstring(bytes[0]);
 }
 
+BOOL CountryDataDialog::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	GetDlgItem(IDC_EDIT1)->SetWindowText((LPCTSTR)L"IPBase.data");
+	return TRUE;
+}
+
 CountryDataDialog::CountryDataDialog(cFwAccess *pFwAccessIn, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CountryDataDialog::IDD, pParent)
 {
 	pFwAccess = pFwAccessIn;
-	
 }
 
 CountryDataDialog::~CountryDataDialog()
@@ -77,7 +84,13 @@ void CountryDataDialog::OnBnClickedButton1()
 			Combo.AddString(buf.GetString());
 		}
 	}
-	// TODO: добавьте свой код обработчика уведомлений
+
+	s = s + L" loaded";
+	int msgboxID = MessageBox(
+				(LPCTSTR)s,
+				(LPCTSTR)L"Database load",
+				MB_OK
+			);
 }
 
 
@@ -101,6 +114,11 @@ void CountryDataDialog::OnBnClickedButton2()
 		// заблокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
 	
+	int msgboxID = MessageBox(
+				(LPCTSTR)L"Group from database blocked",
+				(LPCTSTR)L"Group block",
+				MB_OK
+			);
 }
 
 
@@ -122,6 +140,12 @@ void CountryDataDialog::OnBnClickedButton3()
 		// добавить проверку строки s с DataBase.Base[i].ShortName, если верно то
 		// –ј«блокировать диапазон DataBase.Base[i].from - DataBase.Base[i].to
 	}
+
+	int msgboxID = MessageBox(
+				(LPCTSTR)L"Group from database unblocked",
+				(LPCTSTR)L"Group unblock",
+				MB_OK
+			);
 }
 
 
